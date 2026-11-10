@@ -1,0 +1,11 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Static site on Cloudflare Workers: no server code, just the built files in dist/.
+  "name": "hyperjump-landing",
+  "compatibility_date": "2026-11-01",
+  "build": { "command": "npm run build" },
+  "assets": {
+    "directory": "dist",
+    "not_found_handling": "404-page"
+  }
+}
