@@ -24,6 +24,8 @@ export default function ArrivalScene(props: Props) {
     <Canvas
       orthographic
       frameloop={props.active ? "always" : "never"}
+      // measure layout size, not on-screen size: the desktop page is CSS-zoomed between 1024 and 1439px
+      resize={{ offsetSize: true }}
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       camera={{ position: [0, 400, 0], zoom: 1, near: 1, far: 1000 }}

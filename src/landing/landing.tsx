@@ -217,7 +217,7 @@ function Hero() {
       <Box x={850} y={60} w={550} h={inner} className="pointer-events-none border-l" style={line} />
 
       {/* Headline block, centred in the column */}
-      <TagStrip x={296} y={229} w={478} label="jump 002, applications open" />
+      <TagStrip x={296} y={229} w={478} label="jump 02, applications open" />
       <Box x={296} y={309} w={478} as="h1" className={cn(display, "pointer-events-auto text-[72px] leading-[72px] tracking-[-0.03em] text-white")}>
         {HERO_TITLE[0]}<br />{HERO_TITLE[1]}
       </Box>

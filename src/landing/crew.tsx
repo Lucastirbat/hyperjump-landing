@@ -63,7 +63,6 @@ export const STATIONS: Station[] = [
   ] },
   { key: "go-to-market", name: "go-to-market", covers: "sales, growth, pricing, your first customers.", side: "right", slot: 1, part: "nose", crew: [
     { name: "Ricky Horwitz", role: "Investor and Head of GTM", tags: ["gtm", "sales"] },
-    { name: "Luca Stirbat", role: "Investor. CEO, ReaktorX", tags: ["investor", "founder"] },
     { name: "Magne Jul Pedersen", role: "Investor. Investment analyst, Founderment", tags: ["investor", "analysis"] },
   ] },
   { key: "legal", name: "legal & ops", covers: "your US C-corp, contracts, visas, finance.", side: "left", slot: 2, part: "wing-lower", crew: [
@@ -72,6 +71,7 @@ export const STATIONS: Station[] = [
   ] },
   { key: "hiring", name: "hiring & team", covers: "first hires, culture, leading people.", side: "right", slot: 2, part: "hull", crew: [
     { name: "Ben Price", role: "Recruiting and talent acquisition", tags: ["recruiting", "sourcing"] },
+    { name: "Luca Stirbat", role: "running hyperjump", tags: ["investor", "founder"] },
   ] },
 ];
 

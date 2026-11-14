@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { API_URL } from "@/lib/config";
 import { initials, type PastJumper } from "./jumpers";
-import { display, DUNE, IGNITION, MIST, ORBITRON } from "./parts";
+import { display, DUNE, MIST, ORBITRON } from "./parts";
 
 /*
  * People on the landing page: pit crew (mentors) and past jumpers (startups), from Figma components
@@ -57,10 +57,9 @@ export function fixText(s: string) {
 export type Startup = PastJumper;
 
 /** The archive tag's country: the first founder who has one. */
-const countryOf = (s: Startup) => s.founders.find((f) => f.countryCode)?.countryCode ?? null;
 
-/** "jump 01" → "jump 001", the archive-tag spelling. */
-export const jumpTag = (cohort: string) => cohort.trim().toLowerCase().replace(/jump\s*0*(\d+)/, (_, n: string) => `jump ${n.padStart(3, "0")}`);
+/** "jump 1" / "jump 001" → "jump 01", the archive-tag spelling. */
+export const jumpTag = (cohort: string) => cohort.trim().toLowerCase().replace(/jump\s*0*(\d+)/, (_, n: string) => `jump ${String(Number(n)).padStart(2, "0")}`);
 
 /** "Name, CEO" for a solo founder with a headline; otherwise the team's names. */
 const founderLine = (s: Startup) => {
@@ -69,7 +68,6 @@ const founderLine = (s: Startup) => {
   return s.founders.map((f) => f.name).join(", ");
 };
 
-const pad2 = (n: number) => String(n).padStart(2, "0");
 
 // ── shared bits ─────────────────────────────────────────────────────────────
 /** A colour photo with the dither screen, or initials on mist. The purple tint shows when its tile is hovered. */
@@ -84,7 +82,6 @@ export function Photo({ src, name, className, size = 32, dither = true }: { src:
       ) : (
         <span aria-hidden className={cn(display, "absolute inset-0 flex items-center justify-center tracking-[-0.03em]")} style={{ fontSize: size, color: "rgba(31,31,31,0.5)" }}>{initials(name)}</span>
       )}
-      <span aria-hidden className="absolute inset-0 opacity-0 mix-blend-color transition-opacity duration-300 group-hover/tile:opacity-100 group-focus-within/tile:opacity-100" style={{ background: IGNITION }} />
     </div>
   );
 }
@@ -106,8 +103,7 @@ export function StartupTile({ s, n, className, style }: { s: Startup; n: number;
         {s.founders.slice(0, 3).map((f, i) => <Photo key={`${f.name}-${i}`} src={f.photoUrl} name={f.name} className="h-full min-w-0 flex-1" />)}
       </div>
       <div className={cn("absolute left-4 top-[222px] flex w-[225px] justify-between text-[10px] leading-[13px] text-[#1f1f1f]/60 group-hover/tile:text-[#f5f3f0]/60 group-focus-within/tile:text-[#f5f3f0]/60", "transition-colors duration-300")} style={ORBITRON}>
-        <span>{jumpTag(s.cohort)} // {pad2(n)}</span>
-        <span>{countryOf(s)?.toLowerCase()}</span>
+        <span>{jumpTag(s.cohort)}</span>
       </div>
       <h3 className={cn(display, "absolute left-4 top-[240px] w-[225px] truncate text-[22px] leading-[28px] tracking-[-0.02em] text-[#1f1f1f]", hoverText)}>{s.name}</h3>
       {s.oneLiner && (
@@ -124,6 +120,38 @@ export function StartupTile({ s, n, className, style }: { s: Startup; n: number;
         </a>
       )}
     </article>
+  );
+}
+
+/** Phone card: founders' photos, then the startup in a few lines. Shown two to a row, all at once. */
+export function StartupCard({ s }: { s: Startup }) {
+  return (
+    <article className="relative flex flex-col bg-[#f5f3f0] p-1.5 pb-3">
+      <div className="flex aspect-square gap-[2px]">
+        {s.founders.slice(0, 3).map((f, i) => <Photo key={`${f.name}-${i}`} src={f.photoUrl} name={f.name} className="h-full min-w-0 flex-1" size={22} />)}
+      </div>
+      <div className="flex flex-1 flex-col px-1.5 pt-2.5">
+        <span className="text-[9px] leading-3 text-[#1f1f1f]/55" style={ORBITRON}>{jumpTag(s.cohort)}</span>
+        <h3 className={cn(display, "mt-1 truncate text-[17px] leading-[22px] tracking-[-0.02em] text-[#1f1f1f]")}>{s.name}</h3>
+        {s.oneLiner && <p className="mt-1 line-clamp-4 text-[12px] leading-[17px] text-[#1f1f1f]/80">{s.oneLiner}</p>}
+        <p className="mt-auto line-clamp-2 border-t pr-5 pt-2 text-[11px] leading-[15px] text-[#1f1f1f]/60" style={{ borderColor: "rgba(70,70,70,0.15)", marginTop: 10 }}>{s.founders.map((f) => f.name).join(", ")}</p>
+      </div>
+      {s.website && (
+        <a href={s.website} target="_blank" rel="noopener noreferrer" aria-label={`${s.name} website`} className="absolute right-3 top-[calc(100%-26px)] text-[#1f1f1f]/70">
+          <Arrow />
+        </a>
+      )}
+    </article>
+  );
+}
+
+export function StartupCardSkeleton() {
+  return (
+    <div aria-hidden className="flex flex-col p-1.5 pb-3" style={{ background: DUNE }}>
+      <span className="aspect-square animate-pulse" style={{ background: MIST }} />
+      <span className="mx-1.5 mt-3 h-4 w-20 animate-pulse" style={{ background: MIST }} />
+      <span className="mx-1.5 mt-2 h-3 w-28 animate-pulse" style={{ background: MIST }} />
+    </div>
   );
 }
 

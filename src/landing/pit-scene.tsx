@@ -34,6 +34,8 @@ export default function PitScene(props: Props) {
   return (
     <Canvas
       frameloop={props.active ? "always" : "never"}
+      // measure layout size, not on-screen size: the desktop page is CSS-zoomed between 1024 and 1439px
+      resize={{ offsetSize: true }}
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       camera={{ fov: 30, near: 0.1, far: 100, position: [0, 6.7, 2.4] }}

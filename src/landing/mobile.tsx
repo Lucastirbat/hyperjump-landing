@@ -8,7 +8,7 @@ import { Arrival } from "./arrival";
 import { Ill } from "./ill";
 import { useJumpers } from "./jumpers";
 import { MAP_H, MAP_W, shipTopFor, StopDetails, StopList, TOUR_WHY, TourMap, useSelectedStop, useTour } from "./tour";
-import { StartupTile, StartupTileSkeleton } from "./people";
+import { StartupCard, StartupCardSkeleton } from "./people";
 import { CrewCard, STATIONS, useCrewPhotos } from "./crew";
 import { chamfer, chamferAll, Corners, display, DUNE, IconMail, IconSearch, IconShare, IconShield, IGNITION, INK, LINE, MIST, ORBITRON, PATTERN, STONE } from "./parts";
 import {
@@ -188,36 +188,25 @@ function MHero({ ship, progress, launched, tipEls, reducedMotion }: { ship: Ship
   return (
     <section id="top" className="relative pt-14">
       <div className="px-5 pt-8">
-        <Tag label="jump 002, applications open" onDark />
+        <Tag label="jump 02, applications open" onDark />
         <h1 className={cn(display, "mt-6 text-[46px] leading-[48px] tracking-[-0.03em] text-white")}>{HERO_TITLE[0]} {HERO_TITLE[1]}</h1>
         <p className="mt-5 text-[15px] leading-6">{HERO_SUB.join(" ")}</p>
         <JumpLink to="/sign-in" className="mt-7 flex h-[53px] w-full items-center justify-center text-[16px] leading-[21px] font-bold text-[#1f1f1f] opacity-90 active:opacity-100" style={{ background: MIST, clipPath: chamfer(16), ...ORBITRON }}>apply to jump 02</JumpLink>
       </div>
-      <div ref={stage} className="relative mt-9 h-[340px] border-y" style={{ borderColor: LINE, background: "#1e1d2a" }}>
+      <div ref={stage} className="relative mt-9 h-[300px] border-t" style={{ borderColor: LINE, background: "#1e1d2a" }}>
         <Suspense fallback={null}>
           <ShipScene compact model={ship.url} tone={ship.tone} progress={progress} launched={launched} tips={TIPS} tipEls={tipEls} reducedMotion={reducedMotion} />
         </Suspense>
-        {/* numbered markers, positioned on the ship by the scene */}
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          {TIPS.map((tip, i) => (
-            <div key={tip.anchor} ref={(el) => { tipEls.current[i] = el; }} className="absolute left-0 top-0 opacity-0 will-change-transform">
-              <span className="absolute -left-[5px] -top-[5px] size-2.5 rounded-full bg-[#9999FF] shadow-[0_0_12px_2px_rgba(153,153,255,0.75)]" />
-              <span className="absolute left-2 -top-5 text-[11px] leading-[14px] font-normal text-[#f5f3f0]">{String(i + 1).padStart(2, "0")}</span>
-            </div>
-          ))}
-        </div>
       </div>
-      <ol className="px-5 pt-2">
-        {TIPS.map((t, i) => (
-          <li key={t.anchor} className="flex gap-4 border-b py-3" style={{ borderColor: LINE }}>
-            <span className="w-5 pt-0.5 text-[12px] leading-[17px] font-normal text-[#bbbbb5]/65">{String(i + 1).padStart(2, "0")}</span>
-            <div>
-              <p className={cn(display, "text-[16px] leading-[21px] text-[#f5f3f0]")}>{t.title}</p>
-              <p className="mt-0.5 text-[13px] leading-[19px]">{t.body}</p>
-            </div>
+      {/* what you get, in four: a 2×2 grid under the ship (no markers on the ship itself) */}
+      <ul className="grid grid-cols-2 gap-px border-y" style={{ background: LINE, borderColor: LINE }}>
+        {TIPS.map((t) => (
+          <li key={t.anchor} className="bg-[#262626] px-5 py-4">
+            <p className={cn(display, "text-[16px] leading-[21px] text-[#f5f3f0]")}>{t.title}</p>
+            <p className="mt-1 text-[13px] leading-[19px]">{t.body}</p>
           </li>
         ))}
-      </ol>
+      </ul>
       <div className="h-8" />
     </section>
   );
@@ -356,7 +345,7 @@ function MConditions() {
             <li key={c.title} className="flex gap-5 border-t py-6" style={{ borderColor: SOFT }}>
               <div className="shrink-0"><Check /></div>
               <div className="min-w-0">
-                <h3 className={cn(display, "text-[22px] leading-7 tracking-[-0.03em] text-[#1f1f1f]")}>{c.title}</h3>
+                <h3 className={cn(display, "text-[22px] leading-7 tracking-[-0.03em] text-balance text-[#1f1f1f]")}>{c.title}</h3>
                 <p className="mt-2 text-[15px] leading-6" style={{ color: INK80 }}>{c.body}</p>
                 {c.cta && <DarkButton href={GUIDE_HREF} className="mt-4">{c.cta}</DarkButton>}
               </div>
@@ -403,7 +392,7 @@ function Ticket({ to, toLabel, stay, accent }: { to: string; toLabel: string; st
       </div>
       <div className="flex items-end justify-between px-5 pb-4 pt-3">
         <div><p className={small} style={{ color: INK66 }}>stay</p><p className={cn(display, "text-[24px] leading-[30px] tracking-[-0.03em] text-[#1f1f1f]")}>{stay}</p></div>
-        <p className={small} style={{ color: INK66 }}>jump 002, dates tbc</p>
+        <p className={small} style={{ color: INK66 }}>jump 02, dates tbc</p>
       </div>
     </div>
   );
@@ -467,31 +456,17 @@ function MWhatYouGet() {
 function MPastJumpers() {
   const jumpers = useJumpers();
   const startups = useMemo(() => jumpers.data ?? [], [jumpers.data]);
-  const COUNT = startups.length;
-  const row = useRowIndex(265);
-  const go = (d: number) => row.ref.current?.scrollBy({ left: d * 265, behavior: "smooth" });
   return (
     <section id="past" className="scroll-mt-16">
-      <Panel className="px-0">
-        <div className="flex items-center px-5">
-          <Sub className="text-[22px] leading-7">past jumpers</Sub>
-          {COUNT > 0 && <span className={cn("ml-auto text-[13px] tabular-nums", COUNT > 1 && "mr-3.5")} style={{ color: INK66 }}>{String(Math.min(row.i + 1, COUNT)).padStart(2, "0")} / {String(COUNT).padStart(2, "0")}</span>}
-          {COUNT > 1 && [-1, 1].map((d) => (
-            <button key={d} type="button" aria-label={d < 0 ? "Previous startups" : "Next startups"} onClick={() => go(d)} className="ml-px flex size-10 items-center justify-center" style={{ background: INK80 }}>
-              <svg viewBox="0 0 16 16" className="size-4" aria-hidden><path d={d < 0 ? "M10 4L6 8l4 4" : "M6 4l4 4-4 4"} stroke={DUNE} strokeWidth={1.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
-            </button>
-          ))}
-        </div>
-        <p className="mt-2 px-5 text-[13px] leading-[21px]" style={{ color: INK66 }}>15 teams from jump 001, and what they build now.</p>
-        <div ref={row.ref} aria-busy={jumpers.isPending || undefined} className={cn(rowCls, "mt-6 scroll-px-5 px-5")}>
-          {!jumpers.isPending && startups.length === 0 && <p className="py-10 text-[13px] leading-[21px]" style={{ color: INK80 }}>the past jumpers go up here soon.</p>}
-          {jumpers.isPending
-            ? Array.from({ length: 2 }, (_, i) => <StartupTileSkeleton key={i} className="snap-start" />)
-            : startups.map((st, i) => <StartupTile key={st.id} s={st} n={i + 1} className="snap-start" />)}
-        </div>
-        {COUNT > 1 && (
-          <div className="mx-5 mt-5 h-[3px]" style={{ background: SOFT }}>
-            <div className="h-full bg-[#1f1f1f]" style={{ width: `${100 / COUNT}%`, marginLeft: `${row.p * (100 - 100 / COUNT)}%` }} />
+      <Panel>
+        <Sub className="text-[22px] leading-7">past jumpers</Sub>
+        {!jumpers.isPending && startups.length === 0 ? (
+          <p className="py-10 text-[13px] leading-[21px]" style={{ color: INK80 }}>the past jumpers go up here soon.</p>
+        ) : (
+          <div aria-busy={jumpers.isPending || undefined} className="-mx-2 mt-5 grid grid-cols-2 gap-1.5 p-1.5" style={{ background: MIST }}>
+            {jumpers.isPending
+              ? Array.from({ length: 4 }, (_, i) => <StartupCardSkeleton key={i} />)
+              : startups.map((st) => <StartupCard key={st.id} s={st} />)}
           </div>
         )}
       </Panel>
@@ -568,7 +543,7 @@ function MFooter({ shipUrl, shipTone }: { shipUrl: string; shipTone?: number }) 
         back to top
       </button>
       <div className="px-5 pt-8">
-        <Tag label="jump 002 is open" onDark />
+        <Tag label="jump 02 is open" onDark />
         <h2 className={cn(display, "mt-6 text-[38px] leading-[44px] tracking-[-0.03em]")}><span className="text-[#f5f3f0]">Reach escape velocity. </span><span className="text-[#bbbbb5]">apply today.</span></h2>
         <p className="mt-5 text-[15px] leading-6">$75K investment, a pit crew that works with you, two weeks in cee and a month in San Francisco. flights and housing included.</p>
         <JumpLink to="/sign-in" className="mt-7 flex h-[53px] w-full items-center justify-center text-[15px] leading-[21px] font-semibold text-[#1f1f1f] opacity-90 active:opacity-100" style={{ background: MIST, clipPath: chamfer(16), ...ORBITRON }}>apply to jump 02</JumpLink>

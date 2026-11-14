@@ -10,7 +10,7 @@ import { chamferAll, display, DUNE, IGNITION, INK, MIST, ORBITRON } from "./part
  */
 
 // ── copy ────────────────────────────────────────────────────────────────────
-// TODO: the selection tile says decisions by 12 apr, the rail by 15 apr; confirm one date.
+// TODO: the rail says final decisions by 15 apr; the earlier selection tile said 12 apr. Confirm one date.
 export const STEPS_RAIL = [
   { label: "applications open", sub: "until 30th march" },
   { label: "the scouting tour", sub: "22 feb to 21 mar" },
@@ -47,7 +47,7 @@ export const TOUR_ANCHOR = "tour";
 
 // ── tokens ──────────────────────────────────────────────────────────────────
 const ink = (o: number) => `rgba(31,31,31,${o})`;
-const H = cn(display, "pr-16 text-[30px] leading-9 tracking-[-0.9px] text-[#1f1f1f]");
+const H = cn(display, "text-[30px] leading-9 tracking-[-0.9px] text-[#1f1f1f]");
 const CUT = "polygon(12px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 12px) 100%, 0 100%, 0 16px)";
 
 // ── icons (16px line drawings, from the Figma tiles) ────────────────────────
@@ -74,16 +74,27 @@ function Chips({ items, on = MIST }: { items: string[]; on?: string }) {
   );
 }
 
+const RULE = { borderColor: "rgba(31,31,31,0.1)" } as const;
+/** One row of a flattened list: a marker, a short head, then its line. Hairline above. */
+function Row({ mark, head, children, compact, headW = 150 }: { mark: ReactNode; head: string; children: ReactNode; compact?: boolean; headW?: number }) {
+  return (
+    <li className={cn("grid items-baseline gap-x-3 border-t py-3", compact ? "grid-cols-[18px_1fr]" : "")} style={{ ...RULE, ...(compact ? {} : { gridTemplateColumns: `18px ${headW}px 1fr` }) }}>
+      <span className="flex h-5 items-center">{mark}</span>
+      <span className="text-[15px] leading-5 font-normal text-[#1f1f1f]">{head}</span>
+      <span className={cn("text-[14px] leading-5", compact && "col-start-2 mt-0.5")} style={{ color: ink(0.7) }}>{children}</span>
+    </li>
+  );
+}
+const num = (i: number) => <span className="text-[11px] leading-[14px]" style={{ ...ORBITRON, color: ink(0.45) }}>{String(i + 1).padStart(2, "0")}</span>;
 function DarkButton({ children, to, href, className }: { children: ReactNode; to?: string; href?: string; className?: string }) {
   const cls = cn("inline-flex h-[45px] shrink-0 items-center justify-center whitespace-nowrap bg-[#262626] px-9 text-[14px] leading-[21px] font-medium text-[#f5f3f0] opacity-90 transition-opacity hover:opacity-100", className);
   return to ? <JumpLink to={to} className={cls} style={{ clipPath: CUT }}>{children}</JumpLink> : <a href={href} className={cls} style={{ clipPath: CUT }}>{children}</a>;
 }
 
-/** A chamfered tile: content padded 28 / 26, with the step tag ("01 / 05") top-right. */
-function Tile({ tone = DUNE, tag, className, style, children, top = 28, bottom = 28 }: { tone?: string; tag?: string; className?: string; style?: CSSProperties; children: ReactNode; top?: number; bottom?: number }) {
+/** A chamfered tile, content padded 28. */
+function Tile({ tone = DUNE, className, style, children, top = 28, bottom = 28 }: { tone?: string; className?: string; style?: CSSProperties; children: ReactNode; top?: number; bottom?: number }) {
   return (
     <div className={cn("relative", className)} style={{ background: tone, clipPath: chamferAll(16), ...style }}>
-      {tag && <span className="absolute right-7 top-[38px] text-[11px] leading-[14px]" style={{ ...ORBITRON, color: ink(0.45) }}>{tag}</span>}
       <div className="flex h-full flex-col gap-3 px-7" style={{ paddingTop: top, paddingBottom: bottom }}>{children}</div>
     </div>
   );
@@ -126,17 +137,10 @@ function Applications({ compact }: { compact?: boolean }) {
   return (
     <>
       <h3 className={H}>applications open</h3>
-      <Chips items={["jump 02", "accepting applications until 30th march"]} />
-      <ul className={cn("flex gap-1.5", compact && "flex-col")}>
-        {FACTS.map((f) => (
-          <li key={f.head} className="flex flex-1 flex-col gap-1 p-3" style={{ background: MIST }}>
-            <Icon name={f.icon} />
-            <p className={cn(display, "mt-1.5 text-[18px] leading-6 text-[#1f1f1f]")}>{f.head}</p>
-            <p className="text-[13px] leading-[19px]" style={{ color: ink(0.75) }}>{f.body}</p>
-          </li>
-        ))}
+      <ul className="mt-1 border-b" style={RULE}>
+        {FACTS.map((f) => <Row key={f.head} compact={compact} mark={<Icon name={f.icon} />} head={f.head}>{f.body}</Row>)}
       </ul>
-      <p className="text-[14px] leading-[22px]" style={{ color: ink(0.8) }}>
+      <p className="text-[14px] leading-[22px] text-pretty" style={{ color: ink(0.8) }}>
         what we’re actually looking for is exceptional teams and solo founders. we’ve written a guide to building a great application for hyperjump and we recommend teams to take a look before submitting theirs.
       </p>
       <div className="flex-1" />
@@ -152,26 +156,30 @@ function ScoutingTour({ compact }: { compact?: boolean }) {
   return (
     <>
       <h3 className={H}>the scouting tour</h3>
-      <Chips items={["22 feb to 21 mar", "13 cities in cee"]} on={DUNE} />
-      <p className="text-[14px] leading-[22px]" style={{ color: ink(0.8) }}>
+      <Chips items={["13 cities in cee"]} on={DUNE} />
+      <p className="text-[14px] leading-[22px] text-pretty" style={{ color: ink(0.8) }}>
         our head of program travels in-person to 16 cities to meet you in-person and challenge you to spot the most talented future founders. by attending our local events, you significantly increase your chances to be selected in the program.
       </p>
-      <div className="flex flex-col gap-1.5">
+      <div className="min-h-2 flex-1" />
+      <div className="flex flex-col gap-2">
         <p className="text-[13px] leading-[18px] font-medium" style={{ color: ink(0.55) }}>we will challenge your</p>
-        <ul className={cn("flex gap-1.5", compact && "flex-col")}>
-          {SKILLS.map((s) => (
-            <li key={s.label} className="flex flex-1 items-center gap-2 whitespace-nowrap p-3 text-[14px] leading-5 font-normal text-[#1f1f1f]" style={{ background: DUNE }}>
-              <Icon name={s.icon} />{s.label}
+        <ul className={cn("flex gap-x-6 gap-y-2", compact ? "flex-col" : "flex-wrap")}>
+          {SKILLS.map((sk) => (
+            <li key={sk.label} className="flex items-center gap-2 whitespace-nowrap text-[15px] leading-5 font-normal text-[#1f1f1f]">
+              <Icon name={sk.icon} />{sk.label}
             </li>
           ))}
         </ul>
       </div>
-      <p className="flex items-center gap-2.5 p-3 text-[14px] leading-5 font-normal text-[#1f1f1f]" style={{ background: DUNE }}>
+      {/* the payoff of the tour: a contained strip, text wrapped into even lines */}
+      <p className="flex w-fit items-center gap-3 px-4 py-3 text-[14px] leading-[21px] text-[#1f1f1f]" style={{ background: DUNE }}>
         <Icon name="jump" color={IGNITION} />
-        solve our challenge and get fast-tracked to an interview with our investment team.
+        {/* fixed break on desktop so the strip is exactly as wide as its two lines */}
+        <span className={cn(!compact && "whitespace-nowrap")}>
+          solve our challenge and get <span className="font-medium">fast‑tracked</span>{compact ? " " : <br />}<span className="font-medium">to an interview</span> with our investment team.
+        </span>
       </p>
-      <div className="flex-1" />
-      <div><DarkButton href={`#${TOUR_ANCHOR}`}>find out when we are coming to your city</DarkButton></div>
+      <div className="mt-2"><DarkButton href={`#${TOUR_ANCHOR}`} className={cn(compact && "h-auto min-h-[45px] w-full whitespace-normal px-3 py-2.5 text-center text-[13px]")}>find out when we are coming to your city</DarkButton></div>
     </>
   );
 }
@@ -180,16 +188,9 @@ function Selection({ compact }: { compact?: boolean }) {
   return (
     <>
       <h3 className={H}>how you get selected.</h3>
-      <Chips items={["application close 30 mar", "final decisions by 12 apr"]} />
       <div className="flex-1" />
-      <ol className="grid grid-cols-2 gap-1.5">
-        {ROUNDS.map((r, i) => (
-          <li key={r.title} className="flex flex-col gap-1 p-3" style={{ background: MIST }}>
-            <span className="text-[11px] leading-[14px]" style={{ ...ORBITRON, color: ink(0.5) }}>{String(i + 1).padStart(2, "0")}</span>
-            <p className={cn(display, "text-[18px] leading-6 text-[#1f1f1f]")}>{r.title}</p>
-            <p className="text-[13px] leading-[19px]" style={{ color: ink(0.75) }}>{r.body}</p>
-          </li>
-        ))}
+      <ol className="border-b" style={RULE}>
+        {ROUNDS.map((r, i) => <Row key={r.title} compact={compact} mark={num(i)} head={r.title} headW={110}>{r.body}</Row>)}
       </ol>
     </>
   );
@@ -262,14 +263,14 @@ export function TimelineBento({ onHeight }: { onHeight?: (h: number) => void }) 
     <div ref={ref} className="absolute left-[260px] top-0 flex w-[1140px] flex-col gap-px">
       <Tile><StepsRail /></Tile>
       <div className="flex">
-        <Tile tag="01 / 05" className="w-[590px]"><Applications /></Tile>
-        <Tile tag="02 / 05" tone={MIST} className="w-[550px]"><ScoutingTour /></Tile>
+        <Tile className="w-[590px]"><Applications /></Tile>
+        <Tile tone={MIST} className="w-[550px]"><ScoutingTour /></Tile>
       </div>
       <div className="flex gap-px">
-        <Tile tag="03 / 05" className="w-[460px]"><Selection /></Tile>
-        <Tile tag="04 / 05" className="w-[679px]"><Bootcamp /></Tile>
+        <Tile className="w-[460px]"><Selection /></Tile>
+        <Tile className="w-[679px]"><Bootcamp /></Tile>
       </div>
-      <Tile tag="05 / 05" bottom={10}><SanFrancisco /></Tile>
+      <Tile bottom={10}><SanFrancisco /></Tile>
     </div>
   );
 }
@@ -280,11 +281,11 @@ export function TimelineStack() {
   return (
     <div className="space-y-1">
       <Tile className={cls} top={24}><StepsRail compact /></Tile>
-      <Tile className={cls} tag="01 / 05"><Applications compact /></Tile>
-      <Tile className={cls} tag="02 / 05" tone={MIST}><ScoutingTour compact /></Tile>
-      <Tile className={cls} tag="03 / 05"><Selection compact /></Tile>
-      <Tile className={cls} tag="04 / 05"><Bootcamp compact /></Tile>
-      <Tile className={cls} tag="05 / 05"><SanFrancisco compact /></Tile>
+      <Tile className={cls}><Applications compact /></Tile>
+      <Tile className={cls} tone={MIST}><ScoutingTour compact /></Tile>
+      <Tile className={cls}><Selection compact /></Tile>
+      <Tile className={cls}><Bootcamp compact /></Tile>
+      <Tile className={cls}><SanFrancisco compact /></Tile>
     </div>
   );
 }

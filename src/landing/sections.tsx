@@ -333,7 +333,7 @@ function Ticket({ x, y, to, toLabel, stay, accent }: { x: number; y: number; to:
       <span className={small} style={{ left: 239, top: 88, color: INK66 }}>{toLabel}</span>
       <span className={small} style={{ left: PX + 24, top: 18, color: INK66 }}>stay</span>
       <span className={cn(display, "absolute text-[28px] leading-[35px] tracking-[-0.03em] text-[#1f1f1f]")} style={{ left: PX + 24, top: 42 }}>{stay}</span>
-      <span className={small} style={{ left: PX + 24, top: 88, color: INK66 }}>jump 002, dates tbc</span>
+      <span className={small} style={{ left: PX + 24, top: 88, color: INK66 }}>jump 02, dates tbc</span>
     </Box>
   );
 }
@@ -435,7 +435,6 @@ function PastJumpers({ h, startups, pending, count }: { h: number; startups: Sta
     <Section id="past" h={h}>
       <Panel h={h} />
       <Box x={296} y={45} as="h2" className={cn(display, "text-[24px] leading-[30px] tracking-[-0.03em] text-[#1f1f1f]")}>past jumpers</Box>
-      <span className="absolute text-right text-[13px] leading-[21px]" style={{ right: 1440 - 1364, top: 49, color: INK66 }}>15 teams from jump 001, and what they build now.</span>
       <Box x={296} y={STARTUPS_GRID_Y} w={1068} h={grid.h} style={{ background: MIST }} className="overflow-hidden">
         <div aria-hidden className="absolute inset-0 opacity-20" style={{ backgroundImage: PATTERN.hatch(INK) }} />
         {!pending && count === 0 && <p className="absolute inset-0 flex items-center justify-center text-[13px] leading-[21px]" style={{ color: INK80 }}>the past jumpers go up here soon.</p>}
@@ -550,7 +549,7 @@ export function Footer({ shipUrl, shipTone }: { shipUrl: string; shipTone?: numb
       </button>
 
       {/* CTA */}
-      <TagStrip x={296} y={120} w={478} label="jump 002 is open" />
+      <TagStrip x={296} y={120} w={478} label="jump 02 is open" />
       <Box x={296} y={196} w={530} as="h2" className={cn(display, "text-[48px] leading-[67.2px] tracking-[-0.035em]")}>
         <span className="text-[#f5f3f0]">Reach escape velocity. </span><span className="text-[#bbbbb5]">apply today.</span>
       </Box>
