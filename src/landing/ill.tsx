@@ -10,7 +10,7 @@ import "./landing.css";
 const SVGS = import.meta.glob<string>("./el/*.svg", { query: "?raw", import: "default", eager: true });
 const svg = (name: string) => SVGS[`./el/${name}.svg`] ?? "";
 
-export type IllName = "olympiads" | "prototypes" | "depth" | "curiosity" | "agency" | "intelligence" | "growth" | "profiles" | "ground" | "stars" | "tag-graph" | "vortex";
+export type IllName = "olympiads" | "prototypes" | "depth" | "curiosity" | "agency" | "intelligence" | "growth" | "profiles" | "vortex";
 
 export function Ill({ name, w, h, className, style }: { name: IllName; w: number; h: number; className?: string; style?: CSSProperties }) {
   const ref = useRef<HTMLSpanElement>(null);

@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HyperspaceProvider } from "@/components/hyperspace";
 import { LandingPage } from "@/landing/landing";
+import { liftPreloader } from "./boot";
 import "./index.css";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
@@ -16,3 +17,5 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </StrictMode>,
 );
+
+liftPreloader();

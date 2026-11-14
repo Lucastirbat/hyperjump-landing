@@ -2,8 +2,9 @@ import "@fontsource-variable/orbitron";
 import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type MutableRefObject } from "react";
 import { cn } from "@/lib/utils";
 import { JumpLink } from "@/components/hyperspace";
+import { Crosshair } from "@/components/crosshair";
 import type { Tip } from "./ship-scene";
-import { EXPONENTIAL_HREF, STEPS, TIPS } from "./content";
+import { EXPONENTIAL_HREF, HERO_SUB, HERO_TITLE, STEPS, TIPS } from "./content";
 import { Footer, Middle } from "./sections";
 import { LandingMobile } from "./mobile";
 import { Box, chamfer, chamferAll, Corners, DUNE, Frame, IGNITION, IconMail, IconSearch, IconShare, IconShield, INK, LINE, MIST, ORBITRON, PATTERN, Row, TagStrip, display } from "./parts";
@@ -23,7 +24,7 @@ type Ship = { url: string; tone?: number };
 const SHIPS: Ship[] = [
   { url: "/models/ships/ship-01.glb" },
   { url: "/models/ships/ship-02.glb", tone: 0.72 }, // white hull: reads too bright under the scene's lights
-  { url: "/models/ships/ship-03.glb" },
+  { url: "/models/ships/ship-03.glb", tone: 0.72 }, // white and lilac (3dmodelship): same reason
   { url: "/models/ships/ship-04.glb" },
 ];
 
@@ -67,6 +68,7 @@ function useLaunchLock(launched: MutableRefObject<boolean>, disabled: boolean, s
     const block = (e: Event) => {
       if (state === "done") return;
       e.preventDefault();
+      if (document.documentElement.classList.contains("hj-booting")) return; // preloader up: launch once it's gone
       if (state === "idle") launch();
     };
     const onWheel = (e: WheelEvent) => { if (e.deltaY > 0 || state === "locked") block(e); };
@@ -125,7 +127,7 @@ export function LandingPage() {
   const scale = useDesktopScale();
 
   useEffect(() => {
-    document.title = "HyperJump — homework was too easy anyway";
+    document.title = "hyperjump";
     const onScroll = () => { progress.current = Math.min(1, window.scrollY / HERO_H); };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -154,9 +156,10 @@ export function LandingPage() {
         <Hero />
         <Overview />
         <Banner />
-        <Middle />
-        <Footer />
+        <Middle shipUrl={ship.url} shipTone={ship.tone} />
+        <Footer shipUrl={ship.url} shipTone={ship.tone} />
       </div>
+      <Crosshair />
     </div>
   );
 }
@@ -175,11 +178,12 @@ function useDesktopScale() {
 
 // ── header ──────────────────────────────────────────────────────────────────
 function Header() {
+  // No "sign in": everyone comes in through apply.
   const nav = [
-    { label: "program", x: 850, active: true, href: "#timeline" },
-    { label: "about", x: 947, href: "#who" },
-    { label: "faq", x: 1044, href: "#faq" },
-    { label: "sign in", x: 1155, to: "/sign-in" },
+    { label: "what you get", x: 866, active: true, href: "#get" },
+    { label: "pit crew", x: 975, href: "#crew" },
+    { label: "past jumpers", x: 1056, href: "#past" },
+    { label: "faq", x: 1167, href: "#faq" },
   ];
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-[60px] border-b backdrop-blur-[8px]" style={{ borderColor: LINE, background: "rgba(37,36,34,0.8)" }}>
@@ -191,10 +195,9 @@ function Header() {
         <div aria-hidden className="absolute left-10 top-[60px] h-4 w-[180px]" style={{ background: IGNITION, clipPath: "polygon(0 0, 100% 0, calc(100% - 16px) 100%, 16px 100%)" }}>
           <div className="absolute inset-0 opacity-25" style={{ backgroundImage: PATTERN.dots("#262626") }} />
         </div>
-        {nav.map((n) => {
-          const cls = cn("absolute top-5 text-[13px] leading-[21px] transition-colors hover:text-[#f5f3f0]", n.active ? "text-[#f5f3f0]" : "text-[#bbbbb5]");
-          return n.to ? <JumpLink key={n.label} to={n.to} className={cls} style={{ left: n.x }}>{n.label}</JumpLink> : <a key={n.label} href={n.href} className={cls} style={{ left: n.x }}>{n.label}</a>;
-        })}
+        {nav.map((n) => (
+          <a key={n.label} href={n.href} className={cn("absolute top-5 text-[13px] leading-[21px] transition-colors hover:text-[#f5f3f0]", n.active ? "text-[#f5f3f0]" : "text-[#bbbbb5]")} style={{ left: n.x }}>{n.label}</a>
+        ))}
         <JumpLink to="/sign-in" className="absolute left-[1243px] top-0 flex h-[59px] w-[157px] items-center justify-center text-[22px] leading-[21px] font-black text-white opacity-90 transition-opacity hover:opacity-100" style={{ background: IGNITION, ...ORBITRON }}>
           apply
         </JumpLink>
@@ -215,11 +218,11 @@ function Hero() {
 
       {/* Headline block, centred in the column */}
       <TagStrip x={296} y={229} w={478} label="jump 002, applications open" />
-      <Box x={296} y={309} w={456} as="h1" className={cn(display, "pointer-events-auto text-[72px] leading-[72px] tracking-[-0.03em] text-white")}>
-        Homework was too easy anyway
+      <Box x={296} y={309} w={478} as="h1" className={cn(display, "pointer-events-auto text-[72px] leading-[72px] tracking-[-0.03em] text-white")}>
+        {HERO_TITLE[0]}<br />{HERO_TITLE[1]}
       </Box>
       <Box x={296} y={541} w={478} as="p" className="pointer-events-auto text-[15px] leading-6">
-        Investing $75K for builders U25 from Central Eastern Europe.<br />For Olympiad medalists, early builders, and technical prodigies.
+        {HERO_SUB[0]}<br />{HERO_SUB[1]}
       </Box>
       <JumpLink to="/sign-in" className="pointer-events-auto absolute left-[296px] top-[649px] flex h-[53px] w-[222px] items-center justify-center text-[16px] leading-[21px] font-bold text-[#1f1f1f] opacity-90 transition-opacity hover:opacity-100" style={{ background: MIST, clipPath: chamfer(16), ...ORBITRON }}>
         apply to jump 02
@@ -289,10 +292,10 @@ function Overview() {
 
       <TagStrip x={296} y={116} w={514} label="overview" />
       <Box x={296} y={252} w={514} as="p" className={cn(display, "text-[28px] leading-[35px] tracking-[-0.03em]")}>
-        hyperjump is an <span className={D}>accelerator</span> <span className={W}>for builders</span> <span className={W}>under 25 </span>from central and eastern europe.
+        hyperjump is an <span className={D}>accelerator</span> <span className={W}>for builders</span> <span className={W}>under 26 </span>from central and eastern europe.
       </Box>
       <Box x={296} y={397} w={514} as="p" className={cn(display, "text-[28px] leading-[35px] tracking-[-0.03em]")}>
-        <span className={D}>We invest</span> in your company, <span className={D}>provide a team of</span> experienced operators, <span className={D}>and give you the</span> time, money and network to <span className={D}>build something serious,</span> years earlier than you’ve planned.
+        <span className={D}>We invest</span> in your company, provide a team of <span className={D}>experienced operators</span>, and give you the <span className={D}>time, money and network to</span> build something serious, <span className={D}>years earlier than you’ve planned.</span>
       </Box>
 
       {/* how to join */}
@@ -336,7 +339,7 @@ function Banner() {
       <TagStrip x={296} y={36} w={1068} label="powered by exponential" dark solid />
       <Box x={296} y={116} w={780} as="p" className={cn(display, "text-[32px] leading-10 tracking-[-0.03em]")}>
         <span className="text-[#666666]">we’re part of exponential, a venture capital fund based in san francisco investing in startups. </span>
-        <span style={{ color: INK }}>hyperjump is how exponential finds founders years before everyone else does.</span>
+        <span style={{ color: INK }}>hyperjump is the first step for founders who want to grow with us.</span>
       </Box>
       <img src="/landing/el/exponential.svg" alt="exponential" width={207} height={69} className="absolute left-[1157px] top-[102px]" />
       <a href={EXPONENTIAL_HREF} className="absolute left-[1151px] top-[191px] flex h-[45px] w-[213px] items-center justify-center text-[13px] leading-[21px] font-medium text-[#f5f3f0] opacity-90 transition-opacity hover:opacity-100" style={{ background: "#262626", clipPath: chamfer(16) }}>

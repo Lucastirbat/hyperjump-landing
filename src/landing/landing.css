@@ -60,19 +60,6 @@
 .hj-ill--profiles.is-in path:not(.hj-draw) {
   animation: hj-in 0.7s ease both, hj-twinkle 2.4s ease-in-out 1.6s infinite;
 }
-/* tour map: the grid blinks softly, the stars hover, the next stop pulses, the route flows */
-.hj-ill--ground.is-in path:not(:first-child) {
-  animation: hj-in 0.6s ease both, hj-blink 3.4s ease-in-out infinite;
-  animation-delay: calc(min(var(--i, 0), 24) * 25ms), calc(1s + var(--i, 0) * 230ms);
-}
-.hj-ill--stars [stroke-dasharray] { animation: hj-flow 1.4s linear infinite; }
-.hj-ill--stars.is-in path[fill="#1F1F1F"]:not([fill-opacity]) {
-  animation: hj-in 0.7s ease both, hj-hover 3s ease-in-out infinite;
-  animation-delay: calc(var(--i, 0) * 45ms), calc(1s + var(--i, 0) * 120ms);
-}
-.hj-ill--stars.is-in path[fill="#6442FD"] { animation: hj-in 0.7s ease both, hj-pulse 1.8s ease-in-out 0.8s infinite; }
-/* archive tag graph: wipes in */
-.hj-ill--tag-graph.is-in > svg { animation: hj-wipe 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.2s both; }
 /* footer vortex: draws in, then breathes */
 .hj-ill--vortex.is-in > svg { animation: hj-breathe 6s ease-in-out 2s infinite; }
 .hj-ill--vortex.is-in .hj-draw { animation-duration: 2.4s; }
@@ -82,6 +69,40 @@
 .hj-ping { transform-box: fill-box; transform-origin: 50% 50%; animation: hj-pulse 1.8s ease-in-out infinite; }
 .hj-star { transform-box: fill-box; transform-origin: 50% 50%; animation: hj-twinkle 2.6s ease-in-out infinite; }
 
+/* Scouting tour map: the ship hovers in place, its engine flickers. */
+@keyframes hj-engine { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.hj-ship-bob { animation: hj-hover 3.2s ease-in-out infinite; }
+.hj-engine { animation: hj-engine 0.9s ease-in-out infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  .hj-ill *, .hj-ill > svg, .hj-flow, .hj-ping, .hj-star { animation: none !important; }
+  .hj-ill *, .hj-ill > svg, .hj-flow, .hj-ping, .hj-star, .hj-ship-bob, .hj-engine { animation: none !important; }
+}
+
+/* Dither screen over colour photos (pit crew, past jumpers): a fine dot grid blended with overlay, so it
+   bites into mid and dark tones and barely touches the highlights. */
+.hj-dither {
+  position: absolute; inset: 0; pointer-events: none;
+  mix-blend-mode: overlay; opacity: 0.55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1.5' height='1.5' fill='%23000'/%3E%3Crect x='2' y='2' width='1.5' height='1.5' fill='%23000'/%3E%3C/svg%3E");
+  background-size: 4px 4px;
+}
+
+/* Footer band: the ship drops out of hyperspace (arrival.tsx). Hidden until the band scrolls in. */
+.hj-arrival .hj-arrive, .hj-arrival .hj-flash { opacity: 0; }
+.hj-arrival .hj-trail { width: var(--trail); height: 1px; opacity: 0.85; }
+.hj-arrival .hj-streak { background: linear-gradient(to right, rgba(245, 243, 240, 0), rgba(245, 243, 240, 0.9)); }
+.hj-arrival .hj-flash { background: radial-gradient(circle, rgba(255, 255, 255, 0.45), rgba(153, 153, 255, 0.18) 38%, rgba(100, 66, 253, 0) 70%); }
+.hj-arrival.is-on .hj-streak { animation: hj-streak 620ms cubic-bezier(0.55, 0, 0.8, 0.2) both; }
+.hj-arrival.is-on .hj-arrive { opacity: 1; animation: hj-arrive 1400ms cubic-bezier(0.1, 0.9, 0.18, 1) 260ms both; }
+.hj-arrival.is-on .hj-trail { animation: hj-trail 1700ms cubic-bezier(0.1, 0.9, 0.18, 1) 260ms both; }
+.hj-arrival.is-on .hj-flash { animation: hj-flash 750ms ease-out 560ms both; }
+@keyframes hj-streak { 0% { left: -30%; opacity: 0; } 25% { opacity: var(--o); } 100% { left: 110%; opacity: 0; } }
+@keyframes hj-arrive { 0% { opacity: 0; transform: translateX(var(--from)) scaleX(1.6); } 12% { opacity: 1; } 60% { transform: translateX(0) scaleX(1.02); } 100% { opacity: 1; transform: none; } }
+@keyframes hj-drift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(2px); } }
+@keyframes hj-trail { from { width: var(--trail-from); opacity: 1; } to { width: var(--trail); opacity: 0.85; } }
+@keyframes hj-flash { 0% { opacity: 0; transform: scale(0.3); } 25% { opacity: 0.7; } 100% { opacity: 0; transform: scale(1.2); } }
+@media (prefers-reduced-motion: reduce) {
+  .hj-arrival .hj-arrive { opacity: 1; }
+  .hj-arrival .hj-streak, .hj-arrival .hj-flash { display: none; }
+  .hj-arrival .hj-arrive, .hj-arrival .hj-trail, .hj-arrival .hj-arrival-bob { animation: none !important; }
 }

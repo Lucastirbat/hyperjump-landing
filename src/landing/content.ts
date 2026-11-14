@@ -10,7 +10,10 @@ export const TIPS: Tip[] = [
   { anchor: "tip-nose", dx: 24, dy: 150, title: "San Francisco", body: "Spend 1 month building with us." },
 ];
 
-export const STEPS = ["Decide if you go solo or with a team", "Complete your profile online", "Submit your application or meet us in-person", "Get selected and travel to the Proving Grounds"];
+export const HERO_TITLE = ["Start lightyears", "ahead of everyone"];
+export const HERO_SUB = ["apply and get $75K investment and one month in San Francisco.", "for math, programming, physics, robotics exceptional talent, under 26."];
+
+export const STEPS = ["decide if you go solo or with a team", "fill your application online", "meet us in-person in your home country", "get selected and travel to san francisco"];
 
 // TODO: link "read more" to exponential's page once the URL is confirmed.
 export const EXPONENTIAL_HREF = "#";

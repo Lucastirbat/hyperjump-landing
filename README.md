@@ -5,7 +5,8 @@ The public landing page for HyperJump, served at **hyperjump.exponential.vc**. I
 It talks to the HyperJump platform (`hyperjump.dev` by default) in two ways:
 
 - **Apply / sign in** links go to `https://hyperjump.dev/sign-in?jump=1`. The landing page plays the first half of the hyperspace jump, and the platform plays the drop-out when it sees `?jump=1`.
-- **Past jumpers** cards load from `GET https://hyperjump.dev/api/public/jumpers`. That's the admin's Startups list, with its edits. The platform allows any origin on that endpoint.
+- **Past jumpers** cards load from `GET https://hyperjump.dev/api/public/past-jumpers`: the admin's showcase, limited to published entries of startups accepted into a jump, with the one-liner from the Startups list. The platform allows any origin on that endpoint.
+- **Pit crew** loads from `GET https://hyperjump.dev/api/public/mentors?cohort=…` (any origin).
 
 To point the site at a different platform URL, set `VITE_APP_URL` at build time (see `.env.example`).
 

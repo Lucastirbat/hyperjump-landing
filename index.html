@@ -1,19 +1,34 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="hj-booting">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#262626" />
-    <title>HyperJump · Homework was too easy anyway</title>
+    <title>hyperjump</title>
     <meta name="description" content="HyperJump invests $75K in technical founders under 25 from Central and Eastern Europe. Olympiad medalists, early builders and technical prodigies: apply solo or as a team of up to 3." />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="512x512" />
     <link rel="canonical" href="https://hyperjump.exponential.vc/" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://hyperjump.exponential.vc/" />
-    <meta property="og:title" content="HyperJump · Homework was too easy anyway" />
+    <meta property="og:title" content="HyperJump · Start lightyears ahead" />
     <meta property="og:description" content="$75K for technical founders under 25 from Central and Eastern Europe. A month building in San Francisco, with founders who've done it before." />
+    <!-- Preloader: painted before any JS so fonts and images never pop in. src/boot.ts lifts it. -->
+    <style>
+      html.hj-booting { overflow: hidden; }
+      #hj-boot { position: fixed; inset: 0; z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; background: #262626; transition: opacity 450ms ease, visibility 450ms; }
+      #hj-boot.done { opacity: 0; visibility: hidden; }
+      #hj-boot img { display: block; width: 30px; height: 43px; opacity: 0.9; }
+      #hj-boot .bar { position: relative; width: 112px; height: 1px; overflow: hidden; background: rgba(187, 187, 181, 0.16); }
+      #hj-boot .bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; background: #6442fd; animation: hj-boot 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+      @keyframes hj-boot { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+      @media (prefers-reduced-motion: reduce) { #hj-boot { transition: none; } #hj-boot .bar::after { animation: none; width: 100%; opacity: 0.5; } }
+    </style>
   </head>
   <body>
+    <div id="hj-boot" role="status" aria-label="loading">
+      <img src="/landing/el/hj-mark-white.svg" alt="" />
+      <span class="bar"></span>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
