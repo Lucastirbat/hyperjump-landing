@@ -152,7 +152,7 @@ function ScoutingTour({ compact }: { compact?: boolean }) {
   return (
     <>
       <h3 className={H}>the scouting tour</h3>
-      <Chips items={["22 feb to 21 mar", "16 cities in cee"]} on={DUNE} />
+      <Chips items={["22 feb to 21 mar", "13 cities in cee"]} on={DUNE} />
       <p className="text-[14px] leading-[22px]" style={{ color: ink(0.8) }}>
         our head of program travels in-person to 16 cities to meet you in-person and challenge you to spot the most talented future founders. by attending our local events, you significantly increase your chances to be selected in the program.
       </p>

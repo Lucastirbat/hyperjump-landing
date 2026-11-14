@@ -8,7 +8,7 @@ import { COUNTRIES, GRATICULE, GRATICULE_LABELS, PROJ } from "./tour-geo";
  * Lambert conformal conic projection. Country outlines (Natural Earth, tour-geo.ts) under a star chart: cities are stars at their real positions,
  * the tour is a constellation, and the hero's ship flies it. The next stop's country is tinted purple.
  * Where the ship is comes from today's date: parked at the first stop before the tour, between the last
- * stop and the next one during it, at the last stop after. Add ?today=2027-02-10 to the URL to preview a date.
+ * stop and the next one during it, at the last stop after. Add ?today=2027-03-06 to the URL to preview a date.
  * Hover or focus a star for its card; click a star or a row to show that stop on the right.
  * Click any country and the ship flies there: to the stop if the country has one, otherwise to the country,
  * with a card pointing at the nearest stop (which also opens on the right).
@@ -31,23 +31,34 @@ export type Stop = {
 };
 
 /** Why the tour exists, under its title. */
-export const TOUR_WHY = "we travel in-person through 16 countries to meet you. in every city, we organize a scouting session where you will be challenged to solve a problem on the spot. if you stand out, you will get fast-tracked to an interview with our investment team.";
+export const TOUR_WHY = "we travel in-person through 13 countries to meet you. in every city, we organize a scouting session where you will be challenged to solve a problem on the spot. if you stand out, you will get fast-tracked to an interview with our investment team.";
 
-// TODO: mock-up dates and times (February 2027) until the real tour is set. Each stop's event will be on
+// 22 feb to 21 mar 2027. The route: the balkans first, up through central europe, a hop to the baltics,
+// then back south via warsaw, kyiv (overnight trains) and chisinau, ending next door to where it started.
+// TODO: per-stop dates and times are placeholders until the real tour is set. Each stop's event will be on
 // Luma: put its event URL in `lumaUrl` and the venue once it's announced.
 export const TOUR: Stop[] = [
-  { city: "bucharest", country: "romania", lon: 26.1, lat: 44.43, date: "2027-02-02", time: "17:00 to 21:00", venue: null, lumaUrl: null },
-  { city: "sofia", country: "bulgaria", lon: 23.32, lat: 42.7, date: "2027-02-05", time: "17:00 to 21:00", venue: null, lumaUrl: null },
-  { city: "belgrade", country: "serbia", lon: 20.46, lat: 44.79, date: "2027-02-09", time: "17:00 to 21:00", venue: null, lumaUrl: null },
-  { city: "budapest", country: "hungary", lon: 19.04, lat: 47.5, date: "2027-02-12", time: "17:00 to 21:00", venue: null, lumaUrl: null, side: "left" },
-  { city: "prague", country: "czechia", lon: 14.42, lat: 50.08, date: "2027-02-16", time: "17:00 to 21:00", venue: null, lumaUrl: null },
-  { city: "warsaw", country: "poland", lon: 21.01, lat: 52.23, date: "2027-02-19", time: "17:00 to 21:00", venue: null, lumaUrl: null },
-  { city: "vilnius", country: "lithuania", lon: 25.28, lat: 54.69, date: "2027-02-23", time: "17:00 to 21:00", venue: null, lumaUrl: null },
-  { city: "tallinn", country: "estonia", lon: 24.75, lat: 59.44, date: "2027-02-26", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "bucharest", country: "romania", lon: 26.1, lat: 44.43, date: "2027-02-22", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "sofia", country: "bulgaria", lon: 23.32, lat: 42.7, date: "2027-02-24", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "skopje", country: "north macedonia", lon: 21.43, lat: 42.0, date: "2027-02-26", time: "17:00 to 21:00", venue: null, lumaUrl: null, side: "left" },
+  { city: "belgrade", country: "serbia", lon: 20.46, lat: 44.79, date: "2027-03-01", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "zagreb", country: "croatia", lon: 15.98, lat: 45.81, date: "2027-03-03", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "budapest", country: "hungary", lon: 19.04, lat: 47.5, date: "2027-03-05", time: "17:00 to 21:00", venue: null, lumaUrl: null, side: "left" },
+  { city: "prague", country: "czech republic", lon: 14.42, lat: 50.08, date: "2027-03-08", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "tallinn", country: "estonia", lon: 24.75, lat: 59.44, date: "2027-03-11", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "riga", country: "latvia", lon: 24.11, lat: 56.95, date: "2027-03-13", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "vilnius", country: "lithuania", lon: 25.28, lat: 54.69, date: "2027-03-15", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "warsaw", country: "poland", lon: 21.01, lat: 52.23, date: "2027-03-17", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "kyiv", country: "ukraine", lon: 30.52, lat: 50.45, date: "2027-03-19", time: "17:00 to 21:00", venue: null, lumaUrl: null },
+  { city: "chisinau", country: "moldova", lon: 28.86, lat: 47.01, date: "2027-03-21", time: "17:00 to 21:00", venue: null, lumaUrl: null },
 ];
 
+/** Stop country names that differ from Natural Earth's (tour-geo.ts), so the right outline lights up. */
+const GEO_NAME: Record<string, string> = { "north macedonia": "macedonia", "czech republic": "czechia" };
+const geoName = (country: string) => GEO_NAME[country] ?? country;
+
 /** Other cities in the region: dim, unlabelled stars. */
-const OTHERS = [[14.51, 46.06], [15.98, 45.81], [17.11, 48.15], [28.86, 47.01], [30.52, 50.45], [24.11, 56.95], [18.41, 43.86], [21.43, 42.0], [19.82, 41.33], [19.26, 42.44], [27.56, 53.9], [19.94, 50.06], [23.6, 46.77], [27.6, 47.16], [16.6, 49.2], [24.03, 49.84], [18.65, 54.35], [21.23, 45.75], [23.9, 54.9], [26.7, 58.4], [17.04, 51.11], [21.91, 43.32], [27.92, 43.21], [22.57, 51.25], [26.25, 50.62]] as const;
+const OTHERS = [[14.51, 46.06], [17.11, 48.15], [18.41, 43.86], [19.82, 41.33], [19.26, 42.44], [27.56, 53.9], [19.94, 50.06], [23.6, 46.77], [27.6, 47.16], [16.6, 49.2], [24.03, 49.84], [18.65, 54.35], [21.23, 45.75], [23.9, 54.9], [26.7, 58.4], [17.04, 51.11], [21.91, 43.32], [27.92, 43.21], [22.57, 51.25], [26.25, 50.62]] as const;
 
 const day = (iso: string) => new Date(`${iso}T00:00:00`);
 const fmt = (iso: string, o: Intl.DateTimeFormatOptions) => day(iso).toLocaleDateString("en-GB", o).toLowerCase().replace(",", "");
@@ -256,7 +267,7 @@ export function TourMap({ tour, shipSrc, selected, onSelect }: { tour: Tour; shi
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fly only when the selection changes
   }, [selected]);
   const pickCountry = (name: string) => {
-    const stop = tour.stops.findIndex((s) => s.country === name);
+    const stop = tour.stops.findIndex((s) => geoName(s.country) === name);
     if (stop !== -1) {
       setPicked(null);
       if (stop === selected) flyTo(ship, pts[stop]!); else onSelect(stop);
@@ -271,9 +282,9 @@ export function TourMap({ tour, shipSrc, selected, onSelect }: { tour: Tour; shi
   const ahead: [number, number][] = [[route.x, route.y], ...pts.slice(route.seg + 1)];
   const line = (p: [number, number][]) => "M" + p.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join("L");
   const [hover, setHover] = useState<number | null>(null);
-  const tourCountries = useMemo(() => new Set(tour.stops.map((s) => s.country)), [tour.stops]);
-  const nextCountry = tour.next === -1 ? null : tour.stops[tour.next]!.country;
-  const selCountry = picked?.country ?? tour.stops[selected]!.country;
+  const tourCountries = useMemo(() => new Set(tour.stops.map((s) => geoName(s.country))), [tour.stops]);
+  const nextCountry = tour.next === -1 ? null : geoName(tour.stops[tour.next]!.country);
+  const selCountry = picked?.country ?? geoName(tour.stops[selected]!.country);
   const clipId = `hj-tour-clip-${useId().replace(/:/g, "")}`;
   const rad = (ship.heading * Math.PI) / 180;
   const tail = { x: ship.x - Math.sin(rad) * 24, y: ship.y + Math.cos(rad) * 24 };
