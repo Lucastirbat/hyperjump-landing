@@ -34,45 +34,44 @@ export type Station = {
 
 // The pit crew: Exponential's team from exponential.vc (advisors left out). Each name must match a mentor in
 // the platform's jump 02 cohort (CREW_COHORT, people.tsx), which supplies the photo. Roles and tags are
-// condensed from their exponential.vc lines; "help" lines are for them to write.
+// condensed from their exponential.vc lines; "help" lines are for them to write. LinkedIn comes from the platform.
 export const STATIONS: Station[] = [
   { key: "product", name: "product & strategy", covers: "what to build, who it’s for, how to position it.", side: "right", slot: 0, part: "cockpit", crew: [
-    { name: "Ashley Wakefield", role: "Product strategy, product management and customer success, Exponential", tags: ["product", "customer success"] },
-    { name: "Novia Bui", role: "UI/UX and product design, Exponential", tags: ["ui/ux", "product design"] },
-    { name: "Cat Oshiro", role: "UI/UX and product design, Exponential", tags: ["ui/ux", "product design"] },
+    { name: "Ashley Wakefield", role: "Product strategy, product management and customer success", tags: ["product", "customer success"] },
+    { name: "Patricia Ebner", role: "Head of Brand Development and Transformation", tags: ["brand", "growth"] },
+    { name: "Novia Bui", role: "UI/UX and product design", tags: ["ui/ux", "product design"] },
+    { name: "Cat Oshiro", role: "UI/UX and product design", tags: ["ui/ux", "product design"] },
   ] },
   { key: "engineering", name: "engineering & ai", covers: "architecture, scaling, machine learning.", side: "left", slot: 1, part: "engine", crew: [
-    { name: "Mrinal Kalakrishnan", role: "Chief AI Roboticist, Exponential. Director at Meta FAIR, ex-Google X", tags: ["robotics", "ai"] },
-    { name: "Eranda Bregasi", role: "Principal, AI Research, Exponential", tags: ["ai agents", "robotics"] },
-    { name: "Manoj Acharya", role: "AI/ML research and engineering, Exponential", tags: ["ai/ml", "research"] },
-    { name: "Tracy Shen", role: "AI/ML and agentic systems, Exponential", tags: ["ai/ml", "agents"] },
-    { name: "Luis Pineda", role: "ML and robotics, Exponential", tags: ["ml", "robotics"] },
-    { name: "Harry Yuan", role: "ML engineering, Exponential. Founder, Health Council", tags: ["ml", "health"] },
-    { name: "Shuichi Tsutsumi", role: "iOS engineering, Exponential", tags: ["ios", "mobile"] },
-    { name: "Haki Malai", role: "Full-stack development, Exponential", tags: ["full stack", "web"] },
-    { name: "Marcio Pereira De Campos", role: "Full-stack development, Exponential", tags: ["full stack", "web"] },
-    { name: "Oleg Pustovit", role: "Full-stack development, Exponential", tags: ["full stack", "web"] },
+    { name: "Mrinal Kalakrishnan", role: "Chief AI Roboticist. Director at Meta FAIR, ex-Google X", tags: ["robotics", "ai"] },
+    { name: "Eranda Bregasi", role: "Principal, AI Research", tags: ["ai agents", "robotics"] },
+    { name: "Stephen Miller", role: "Investor. CPO and co-founder, Fyusion", tags: ["product", "engineering"] },
+    { name: "Pantelis Kalogiros", role: "Investor. SVP Web and co-founder, Fyusion", tags: ["engineering", "ai"] },
+    { name: "Nate Lee", role: "CISO. CEO and co-founder, TrustMind", tags: ["security", "ciso"] },
+    { name: "Manoj Acharya", role: "AI/ML research and engineering", tags: ["ai/ml", "research"] },
+    { name: "Tracy Shen", role: "AI/ML and agentic systems", tags: ["ai/ml", "agents"] },
+    { name: "Luis Pineda", role: "ML and robotics", tags: ["ml", "robotics"] },
+    { name: "Harry Yuan", role: "ML engineering. Founder, Health Council", tags: ["ml", "health"] },
+    { name: "Shuichi Tsutsumi", role: "iOS engineering", tags: ["ios", "mobile"] },
+    { name: "Haki Malai", role: "Full-stack development", tags: ["full stack", "web"] },
+    { name: "Marcio Pereira De Campos", role: "Full-stack development", tags: ["full stack", "web"] },
+    { name: "Oleg Pustovit", role: "Full-stack development", tags: ["full stack", "web"] },
   ] },
   { key: "fundraising", name: "fundraising", covers: "your deck, your first investors, your terms.", side: "left", slot: 0, part: "wing-upper", crew: [
-    { name: "Sebastian Thrun", role: "Investor, Exponential. Co-founder of Google X, Waymo and Udacity", tags: ["investor", "ai"] },
-    { name: "Radu B. Rusu", role: "Investor, Exponential. CEO and co-founder, Fyusion", tags: ["investor", "3d vision"] },
-    { name: "Stephen Miller", role: "Investor, Exponential. CPO and co-founder, Fyusion", tags: ["investor", "product"] },
-    { name: "Pantelis Kalogiros", role: "Investor, Exponential. SVP Web and co-founder, Fyusion", tags: ["investor", "engineering"] },
-    { name: "Magne Jul Pedersen", role: "Investor, Exponential. Investment analyst, Founderment", tags: ["investor", "analysis"] },
-    { name: "Luca Stirbat", role: "Investor, Exponential. CEO, ReaktorX", tags: ["investor", "founder"] },
-    { name: "Eric Hartz", role: "Board member, Exponential. Co-founder, Nexus Circular", tags: ["board", "founder"] },
+    { name: "Radu B. Rusu", role: "Investor. CEO and co-founder, Fyusion", tags: ["investor", "3d vision"] },
+    { name: "Eric Hartz", role: "Board member. Co-founder, Nexus Circular", tags: ["board", "founder"] },
   ] },
   { key: "go-to-market", name: "go-to-market", covers: "sales, growth, pricing, your first customers.", side: "right", slot: 1, part: "nose", crew: [
-    { name: "Ricky Horwitz", role: "Investor and Head of GTM, Exponential", tags: ["gtm", "sales"] },
-    { name: "Patricia Ebner", role: "Head of Brand Development and Transformation, Exponential", tags: ["brand", "growth"] },
+    { name: "Ricky Horwitz", role: "Investor and Head of GTM", tags: ["gtm", "sales"] },
+    { name: "Luca Stirbat", role: "Investor. CEO, ReaktorX", tags: ["investor", "founder"] },
+    { name: "Magne Jul Pedersen", role: "Investor. Investment analyst, Founderment", tags: ["investor", "analysis"] },
   ] },
   { key: "legal", name: "legal & ops", covers: "your US C-corp, contracts, visas, finance.", side: "left", slot: 2, part: "wing-lower", crew: [
-    { name: "Yuki Jenkins", role: "Investor and CFO, Exponential. CFO, Fyusion", tags: ["finance", "cfo"] },
-    { name: "Jill Zhu", role: "Finance, accounting and back office, Exponential", tags: ["finance", "accounting"] },
-    { name: "Nate Lee", role: "CISO, Exponential. CEO and co-founder, TrustMind", tags: ["security", "ciso"] },
+    { name: "Yuki Jenkins", role: "Investor and CFO. CFO, Fyusion", tags: ["finance", "cfo"] },
+    { name: "Jill Zhu", role: "Finance, accounting and back office", tags: ["finance", "accounting"] },
   ] },
   { key: "hiring", name: "hiring & team", covers: "first hires, culture, leading people.", side: "right", slot: 2, part: "hull", crew: [
-    { name: "Ben Price", role: "Recruiting and talent acquisition, Exponential", tags: ["recruiting", "sourcing"] },
+    { name: "Ben Price", role: "Recruiting and talent acquisition", tags: ["recruiting", "sourcing"] },
   ] },
 ];
 
