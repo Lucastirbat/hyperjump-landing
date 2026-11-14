@@ -32,36 +32,47 @@ export type Station = {
   crew: CrewMember[];
 };
 
-// TODO: confirm with the team. Stations, roles and tags are a first pass read from each mentor's own
-// platform bio; "help" lines are for the mentors to write.
+// The pit crew: Exponential's team from exponential.vc (advisors left out). Each name must match a mentor in
+// the platform's jump 02 cohort (CREW_COHORT, people.tsx), which supplies the photo. Roles and tags are
+// condensed from their exponential.vc lines; "help" lines are for them to write.
 export const STATIONS: Station[] = [
   { key: "product", name: "product & strategy", covers: "what to build, who it’s for, how to position it.", side: "right", slot: 0, part: "cockpit", crew: [
-    { name: "Uldis Leiterts", role: "VP of Product & Growth, Emotiv. Co-founder, Infogram", tags: ["product", "growth"] },
-    { name: "Roberts Bernans", role: "Building BADbrain at BADideas.fund. Ex-CPO, Nordigen", tags: ["product", "fintech"] },
-    { name: "Momchil Kyurkchiev", role: "Co-founder, Leanplum (acquired 2022)", tags: ["mobile", "engagement"] },
+    { name: "Ashley Wakefield", role: "Product strategy, product management and customer success, Exponential", tags: ["product", "customer success"] },
+    { name: "Novia Bui", role: "UI/UX and product design, Exponential", tags: ["ui/ux", "product design"] },
+    { name: "Cat Oshiro", role: "UI/UX and product design, Exponential", tags: ["ui/ux", "product design"] },
   ] },
   { key: "engineering", name: "engineering & ai", covers: "architecture, scaling, machine learning.", side: "left", slot: 1, part: "engine", crew: [
-    { name: "Peter Tuszynski", role: "CTO, intent", tags: ["machine learning", "iot"] },
-    { name: "Lukasz Bolikowski", role: "VP Data Science, BCG X", tags: ["ai/ml", "gen ai"] },
-    { name: "Saad Bashir", role: "Ex-Head Corporate Technology, Zillow. Ex-AWS", tags: ["cloud", "transformation"] },
+    { name: "Mrinal Kalakrishnan", role: "Chief AI Roboticist, Exponential. Director at Meta FAIR, ex-Google X", tags: ["robotics", "ai"] },
+    { name: "Eranda Bregasi", role: "Principal, AI Research, Exponential", tags: ["ai agents", "robotics"] },
+    { name: "Manoj Acharya", role: "AI/ML research and engineering, Exponential", tags: ["ai/ml", "research"] },
+    { name: "Tracy Shen", role: "AI/ML and agentic systems, Exponential", tags: ["ai/ml", "agents"] },
+    { name: "Luis Pineda", role: "ML and robotics, Exponential", tags: ["ml", "robotics"] },
+    { name: "Harry Yuan", role: "ML engineering, Exponential. Founder, Health Council", tags: ["ml", "health"] },
+    { name: "Shuichi Tsutsumi", role: "iOS engineering, Exponential", tags: ["ios", "mobile"] },
+    { name: "Haki Malai", role: "Full-stack development, Exponential", tags: ["full stack", "web"] },
+    { name: "Marcio Pereira De Campos", role: "Full-stack development, Exponential", tags: ["full stack", "web"] },
+    { name: "Oleg Pustovit", role: "Full-stack development, Exponential", tags: ["full stack", "web"] },
   ] },
   { key: "fundraising", name: "fundraising", covers: "your deck, your first investors, your terms.", side: "left", slot: 0, part: "wing-upper", crew: [
-    { name: "Paul Bragiel", role: "Founder of 7 VC funds", tags: ["seed", "series a"] },
-    { name: "Ewa Chronowska", role: "Partner, Next Road Ventures. Founder, Vestbee", tags: ["vc", "fundraising"] },
-    { name: "Borys Musielak", role: "Founding partner, SMOK Ventures", tags: ["early stage", "vc"] },
+    { name: "Sebastian Thrun", role: "Investor, Exponential. Co-founder of Google X, Waymo and Udacity", tags: ["investor", "ai"] },
+    { name: "Radu B. Rusu", role: "Investor, Exponential. CEO and co-founder, Fyusion", tags: ["investor", "3d vision"] },
+    { name: "Stephen Miller", role: "Investor, Exponential. CPO and co-founder, Fyusion", tags: ["investor", "product"] },
+    { name: "Pantelis Kalogiros", role: "Investor, Exponential. SVP Web and co-founder, Fyusion", tags: ["investor", "engineering"] },
+    { name: "Magne Jul Pedersen", role: "Investor, Exponential. Investment analyst, Founderment", tags: ["investor", "analysis"] },
+    { name: "Luca Stirbat", role: "Investor, Exponential. CEO, ReaktorX", tags: ["investor", "founder"] },
+    { name: "Eric Hartz", role: "Board member, Exponential. Co-founder, Nexus Circular", tags: ["board", "founder"] },
   ] },
   { key: "go-to-market", name: "go-to-market", covers: "sales, growth, pricing, your first customers.", side: "right", slot: 1, part: "nose", crew: [
-    { name: "Wiktoria Wójcik", role: "Co-founder, inStreamly", tags: ["marketing", "gaming"] },
-    { name: "Cristi Dragan", role: "Growth, Weekend Games", tags: ["growth", "experiments"] },
-    { name: "Vladislav Pavlov", role: "CEO, Scale SEE", tags: ["sales", "fundraising"] },
+    { name: "Ricky Horwitz", role: "Investor and Head of GTM, Exponential", tags: ["gtm", "sales"] },
+    { name: "Patricia Ebner", role: "Head of Brand Development and Transformation, Exponential", tags: ["brand", "growth"] },
   ] },
   { key: "legal", name: "legal & ops", covers: "your US C-corp, contracts, visas, finance.", side: "left", slot: 2, part: "wing-lower", crew: [
-    { name: "Andrei Valeanu", role: "Co-founder & COO, Embed", tags: ["law", "operations"] },
-    { name: "Andy Toth", role: "Scaled to $100M in the US as an early employee", tags: ["law", "us expansion"] },
+    { name: "Yuki Jenkins", role: "Investor and CFO, Exponential. CFO, Fyusion", tags: ["finance", "cfo"] },
+    { name: "Jill Zhu", role: "Finance, accounting and back office, Exponential", tags: ["finance", "accounting"] },
+    { name: "Nate Lee", role: "CISO, Exponential. CEO and co-founder, TrustMind", tags: ["security", "ciso"] },
   ] },
   { key: "hiring", name: "hiring & team", covers: "first hires, culture, leading people.", side: "right", slot: 2, part: "hull", crew: [
-    { name: "Gyorgy Szilagyi", role: "Co-founder, Tresorit", tags: ["team", "scaling"] },
-    { name: "Carrie Santos", role: "Ex-CEO, Entrepreneurs’ Organization", tags: ["leadership", "community"] },
+    { name: "Ben Price", role: "Recruiting and talent acquisition, Exponential", tags: ["recruiting", "sourcing"] },
   ] },
 ];
 
@@ -149,9 +160,9 @@ export function Pit({ model, tone, photos }: { model: string; tone?: number; pho
         ))}
       </svg>
       {STATIONS.map((s, i) => (
-        <a key={s.key} href={`#crew-${s.key}`} className="group absolute w-[250px]" style={{ left: s.side === "left" ? 32 : 786, top: labelTop(s) }}>
+        <a key={s.key} href={`#crew-${s.key}`} className="group absolute w-[270px]" style={{ left: s.side === "left" ? 32 : 786, top: labelTop(s) }}>
           <span ref={(el) => { names.current[i] = el; }} className={cn(display, "inline-block text-[22px] leading-7 tracking-[-0.02em] text-[#f5f3f0] decoration-[#f5f3f0]/40 underline-offset-4 group-hover:underline")}>{s.name}</span>
-          <span className="mt-[6px] flex gap-[2px]">
+          <span className="mt-[6px] flex flex-wrap gap-[2px]">
             {s.crew.map((m) => <Photo key={m.name} src={lookup(photos, m.name)?.photoUrl ?? null} name={m.name} className="size-6" size={9} dither={false} />)}
           </span>
         </a>

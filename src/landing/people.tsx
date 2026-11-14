@@ -23,11 +23,10 @@ export type Mentor = {
 };
 
 /**
- * Which cohort's mentors to show. The platform only lists a cohort's *active* mentors, and jump 002's
- * aren't active yet, so this shows jump 001's pit crew for now.
- * TODO: switch to jump 002's slug (or drop it to get the platform's current cohort) once they're active.
+ * Which cohort's mentors supply the pit crew's photos: jump 002, the Exponential team. The platform only
+ * lists a cohort's *active* mentors.
  */
-export const CREW_COHORT = "hj01-2026";
+export const CREW_COHORT = "hj02-2027";
 
 async function fetchMentors(): Promise<Mentor[]> {
   const res = await fetch(`${API_URL}/api/public/mentors?cohort=${encodeURIComponent(CREW_COHORT)}`);
