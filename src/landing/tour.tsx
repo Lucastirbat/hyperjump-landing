@@ -484,35 +484,64 @@ export function StopDetails({ tour, selected, className }: { tour: Tour; selecte
   );
 }
 
-export function StopList({ tour, selected, onSelect, className }: { tour: Tour; selected: number; onSelect: (i: number) => void; className?: string }) {
+const ROW_H = 34; // 33px row + 1px border
+
+/**
+ * The stops, in tour order. With `rows`, the list is capped at that many rows and scrolls inside (desktop,
+ * where the card has a fixed height): edges fade while there's more to scroll, and the selected stop is
+ * scrolled into view when it changes.
+ */
+export function StopList({ tour, selected, onSelect, rows, className }: { tour: Tour; selected: number; onSelect: (i: number) => void; rows?: number; className?: string }) {
+  const scroller = useRef<HTMLDivElement>(null);
+  const capped = rows !== undefined && tour.stops.length > rows;
+  const [edge, setEdge] = useState({ top: false, bottom: capped });
+  const measure = () => {
+    const el = scroller.current; if (!el) return;
+    setEdge({ top: el.scrollTop > 1, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 1 });
+  };
+  useEffect(() => {
+    const el = scroller.current; if (!capped || !el) return;
+    // keep the selected row in view, with a row of context around it; scroll the list only, never the page
+    const top = selected * ROW_H, want = Math.min(Math.max(el.scrollTop, top + 2 * ROW_H - el.clientHeight), Math.max(0, top - ROW_H));
+    if (want !== el.scrollTop) el.scrollTo({ top: want, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    measure();
+  }, [selected, capped]);
+  const fade = `linear-gradient(to bottom, ${edge.top ? "transparent" : "#000"}, #000 28px, #000 calc(100% - 40px), ${edge.bottom ? "transparent" : "#000"})`;
   return (
     <div className={className}>
-      <p className="text-[13px] leading-[21px] text-[#1f1f1f]/66">all stops</p>
-      <ol className="mt-2.5 border-b" style={{ borderColor: "rgba(31,31,31,0.12)" }}>
-        {tour.stops.map((s, i) => {
-          const st = tour.state[i]!;
-          return (
-            <li key={s.city} className="border-t" style={{ borderColor: "rgba(31,31,31,0.12)" }}>
-              <button
-                type="button"
-                aria-pressed={selected === i}
-                onClick={() => onSelect(i)}
-                className={cn("-mx-2 flex h-[33px] w-[calc(100%+16px)] items-center px-2 text-left text-[13px] leading-[21px] transition-colors hover:bg-[#e0dedb]/60", selected === i && "bg-[#e0dedb] hover:bg-[#e0dedb]", st === "visited" && "opacity-50")}
-              >
-                <span className="w-7 text-[#1f1f1f]/25">{String(i + 1).padStart(2, "0")}</span>
-                <span className="mr-[7px] flex w-[7px] justify-center">
-                  {st === "next" ? <span className="size-2 rounded-full" style={{ background: IGNITION }} />
-                    : st === "visited" ? <span className="size-1.5 rounded-full" style={{ background: INK }} />
-                    : <span className="size-[7px] rounded-full border-[1.25px] border-[#1f1f1f]/60" />}
-                </span>
-                <span className={cn("w-[102px] text-[#1f1f1f]", st === "next" && "font-medium")}>{s.city}</span>
-                <span className="text-[#1f1f1f]/66">{s.country}</span>
-                <span className="ml-auto text-[#1f1f1f]/80">{shortDate(s.date)}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+      <p className="text-[13px] leading-[21px] text-[#1f1f1f]/66">all {tour.stops.length} stops{capped && <span className="text-[#1f1f1f]/40"> // scroll for more</span>}</p>
+      <div
+        ref={scroller}
+        onScroll={capped ? measure : undefined}
+        className={cn("mt-2.5", capped && "-mx-2 overflow-y-auto overscroll-contain px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden")}
+        style={capped ? { height: rows * ROW_H + 1, maskImage: fade, WebkitMaskImage: fade } : undefined}
+      >
+        <ol className="border-b" style={{ borderColor: "rgba(31,31,31,0.12)" }}>
+          {tour.stops.map((s, i) => {
+            const st = tour.state[i]!;
+            return (
+              <li key={s.city} className="border-t" style={{ borderColor: "rgba(31,31,31,0.12)" }}>
+                <button
+                  type="button"
+                  aria-pressed={selected === i}
+                  onClick={() => onSelect(i)}
+                  className={cn("-mx-2 flex h-[33px] w-[calc(100%+16px)] items-center px-2 text-left text-[13px] leading-[21px] transition-colors hover:bg-[#e0dedb]/60", selected === i && "bg-[#e0dedb] hover:bg-[#e0dedb]", st === "visited" && "opacity-50")}
+                >
+                  <span className="w-7 text-[#1f1f1f]/25">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="mr-[7px] flex w-[7px] justify-center">
+                    {st === "next" ? <span className="size-2 rounded-full" style={{ background: IGNITION }} />
+                      : st === "visited" ? <span className="size-1.5 rounded-full" style={{ background: INK }} />
+                      : <span className="size-[7px] rounded-full border-[1.25px] border-[#1f1f1f]/60" />}
+                  </span>
+                  <span className={cn("w-[102px] text-[#1f1f1f]", st === "next" && "font-medium")}>{s.city}</span>
+                  <span className="text-[#1f1f1f]/66">{s.country}</span>
+                  <span className="ml-auto text-[#1f1f1f]/80">{shortDate(s.date)}</span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
     </div>
   );
 }

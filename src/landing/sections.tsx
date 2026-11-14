@@ -258,7 +258,7 @@ function Timeline({ shipUrl, bentoH, onBento }: { shipUrl: string; bentoH: numbe
       <Box x={296} y={M + 77} w={640} as="p" className="text-[15px] leading-6" style={{ color: INK80 }}>{TOUR_WHY}</Box>
       <Box x={296} y={M + 166}><TourMap tour={tour} shipSrc={shipTopFor(shipUrl)} selected={selected} onSelect={setSelected} /></Box>
       <Box x={972} y={M + 166} w={392}><StopDetails tour={tour} selected={selected} /></Box>
-      <Box x={972} y={M + 500} w={392}><StopList tour={tour} selected={selected} onSelect={setSelected} /></Box>
+      <Box x={972} y={M + 500} w={392}><StopList tour={tour} selected={selected} onSelect={setSelected} rows={8} /></Box>
     </Section>
   );
 }
