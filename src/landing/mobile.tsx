@@ -135,7 +135,8 @@ function useRowIndex(step: number) {
   return { ref, i, p };
 }
 
-const rowCls = "flex snap-x snap-mandatory gap-2 overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+// scroll-px: snapping lines cards up with the padding (the panels' 12px inset), not the screen edge
+const rowCls = "flex snap-x snap-mandatory scroll-px-3 gap-2 overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
 
 // ── header + menu ───────────────────────────────────────────────────────────
 const MENU = [["it’s for you if", "#who"], ["what you get", "#get"], ["pit crew", "#crew"], ["past jumpers", "#past"], ["timeline", "#timeline"], ["conditions", "#conditions"], ["faq", "#faq"]];
@@ -295,7 +296,6 @@ function MWhoFor() {
             <p className="mt-5 text-[14px] leading-[22px] text-[#1f1f1f]">{c.body}</p>
           </article>
         ))}
-        <span aria-hidden className="w-1 shrink-0" />
       </div>
       <div className="mt-4 flex justify-center gap-2" aria-hidden>
         {HAVE.map((c, i) => <span key={c.title} className="size-2 rounded-full transition-colors" style={{ background: i === Math.min(row.i, HAVE.length - 1) ? DUNE : "rgba(187,187,181,0.35)" }} />)}
@@ -350,7 +350,7 @@ function MConditions() {
     <section id="conditions" className="scroll-mt-16">
       <Panel>
         <Tag label="conditions" />
-        <Title>To participate, you need to:</Title>
+        <Title>To become a jumper, you need to:</Title>
         <ol className="mt-7">
           {CONDITIONS.map((c, i) => (
             <li key={c.title} className="flex gap-5 border-t py-6" style={{ borderColor: SOFT }}>
@@ -483,12 +483,11 @@ function MPastJumpers() {
           ))}
         </div>
         <p className="mt-2 px-5 text-[13px] leading-[21px]" style={{ color: INK66 }}>15 teams from jump 001, and what they build now.</p>
-        <div ref={row.ref} aria-busy={jumpers.isPending || undefined} className={cn(rowCls, "mt-6 px-5")}>
+        <div ref={row.ref} aria-busy={jumpers.isPending || undefined} className={cn(rowCls, "mt-6 scroll-px-5 px-5")}>
           {!jumpers.isPending && startups.length === 0 && <p className="py-10 text-[13px] leading-[21px]" style={{ color: INK80 }}>the past jumpers go up here soon.</p>}
           {jumpers.isPending
             ? Array.from({ length: 2 }, (_, i) => <StartupTileSkeleton key={i} className="snap-start" />)
             : startups.map((st, i) => <StartupTile key={st.id} s={st} n={i + 1} className="snap-start" />)}
-          <span aria-hidden className="w-2 shrink-0" />
         </div>
         {COUNT > 1 && (
           <div className="mx-5 mt-5 h-[3px]" style={{ background: SOFT }}>
