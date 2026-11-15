@@ -36,7 +36,7 @@ export function Crosshair() {
       if (target) {
         // the frame sits on the element's own box, so it stays still while the pointer moves inside it
         const b = target.getBoundingClientRect(), fr = f.current!;
-        fr.style.transform = `translate3d(${b.left - PAD}px, ${b.top - PAD}px, 0)`;
+        fr.style.translate = `${b.left - PAD}px ${b.top - PAD}px`; // translate, not transform: the press scale then shrinks around its centre
         fr.style.width = `${b.width + PAD * 2}px`;
         fr.style.height = `${b.height + PAD * 2}px`;
         el.dataset.frame = "";
