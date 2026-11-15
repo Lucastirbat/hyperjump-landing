@@ -30,7 +30,7 @@ const SHIPS: Ship[] = [
   { url: "/models/ships/ship-04.glb" },
 ];
 
-/** Next ship in the rotation, remembered per browser so every load is a different ship. Chosen once per page load. */
+/** A ship at random, chosen once per page load. (No rotation remembered in the browser: that would need consent.) */
 let chosenShip: Ship | null = null;
 function nextShip() {
   if (chosenShip) return chosenShip;
@@ -38,14 +38,7 @@ function nextShip() {
   return chosenShip;
 }
 function pickShip() {
-  try {
-    const last = Number(localStorage.getItem("hj-ship") ?? -1);
-    const i = (Number.isFinite(last) ? last + 1 : 0) % SHIPS.length;
-    localStorage.setItem("hj-ship", String(i));
-    return SHIPS[i]!;
-  } catch {
-    return SHIPS[Math.floor(Math.random() * SHIPS.length)]!; // storage blocked: random is the next best thing
-  }
+  return SHIPS[Math.floor(Math.random() * SHIPS.length)]!;
 }
 
 /** How long the page holds still after the first scroll, while the ship drops out of hyperspace. */

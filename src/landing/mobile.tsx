@@ -6,6 +6,7 @@ import { TimelineStack, TOUR_ANCHOR } from "./timeline";
 import { VestingRuler } from "./vesting";
 import { track } from "@/lib/posthog";
 import { scrollToTop } from "@/lib/scroll";
+import { openConsentSettings } from "@/lib/consent";
 import { CountUp } from "./motion";
 import { Arrival } from "./arrival";
 import { Ill } from "./ill";
@@ -597,7 +598,7 @@ function MFooter({ shipUrl, shipTone }: { shipUrl: string; shipTone?: number }) 
       </div>
       <div className="mt-6 border-t px-5 py-6 text-[13px] leading-[21px]" style={{ borderColor: LINE }}>
         <p className="text-[#f5f3f0]">© hyperjump 2026</p>
-        <p className="mt-3 flex flex-wrap gap-x-6 gap-y-1"><span className="text-[#f5f3f0]">all rights reserved</span><a href="#" className="text-[#bbbbb5]">terms of use</a><a href="#" className="text-[#bbbbb5]">privacy policy</a></p>
+        <p className="mt-3 flex flex-wrap gap-x-6 gap-y-1"><span className="text-[#f5f3f0]">all rights reserved</span><a href="#" className="text-[#bbbbb5]">terms of use</a><a href="/privacy" className="text-[#bbbbb5]">privacy policy</a><button type="button" onClick={openConsentSettings} className="text-[#bbbbb5]">cookie settings</button></p>
       </div>
     </footer>
   );

@@ -15,6 +15,7 @@ import { BENTO_H, TimelineBento, TOUR_ANCHOR } from "./timeline";
 import { VestingRuler } from "./vesting";
 import { track } from "@/lib/posthog";
 import { scrollToTop } from "@/lib/scroll";
+import { openConsentSettings } from "@/lib/consent";
 import { CountUp } from "./motion";
 import { Arrival } from "./arrival";
 
@@ -614,11 +615,12 @@ export function Footer({ shipUrl, shipTone }: { shipUrl: string; shipTone?: numb
 
       {/* bottom bar */}
       <Box x={73} y={1129} className="text-[13px] leading-[21px] text-[#f5f3f0]">© hyperjump 2026</Box>
-      <div className="absolute left-[220px] top-[1132px] h-[15px] w-[570px] opacity-25" style={{ backgroundImage: PATTERN.plus(MIST) }} />
-      <Box x={830} y={1128} className="flex gap-10 text-[13px] leading-[21px]">
+      <div className="absolute left-[220px] top-[1132px] h-[15px] w-[500px] opacity-25" style={{ backgroundImage: PATTERN.plus(MIST) }} />
+      <Box x={750} y={1128} className="flex gap-8 text-[13px] leading-[21px]">
         <span className="text-[#f5f3f0]">all rights reserved</span>
         <a href="#" className="text-[#bbbbb5] hover:text-[#f5f3f0]">terms of use</a>
-        <a href="#" className="text-[#bbbbb5] hover:text-[#f5f3f0]">privacy policy</a>
+        <a href="/privacy" className="text-[#bbbbb5] hover:text-[#f5f3f0]">privacy policy</a>
+        <button type="button" onClick={openConsentSettings} className="text-[#bbbbb5] hover:text-[#f5f3f0]">cookie settings</button>
       </Box>
       <div className="absolute left-[1235px] top-[1132px] h-[15px] w-[101px] opacity-25" style={{ backgroundImage: PATTERN.plus(MIST) }} />
       <img src="/landing/el/hj-mark-white.svg" alt="" width={26} height={37} className="absolute left-[1353px] top-[1120px]" />

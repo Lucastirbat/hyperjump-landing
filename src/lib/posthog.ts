@@ -1,12 +1,14 @@
 import posthog from "posthog-js";
 import { APP_URL } from "@/lib/config";
+import { getConsent, onConsentChange } from "@/lib/consent";
 
 /*
- * PostHog: product analytics for the landing page.
+ * PostHog: product analytics and session recordings for the landing page, only with consent.
  *
- * Nothing is stored on the visitor's device (no cookies, no localStorage), so the page needs no cookie
- * banner. The trade-off: each visit is a fresh anonymous visitor, so PostHog can't link two visits by the
- * same person. For a one-page site that still gives full funnels within a visit.
+ * Nothing loads, nothing is sent and nothing is stored until the visitor accepts the cookie banner
+ * (lib/consent.ts). After that PostHog runs with its usual cookie and localStorage, so returning visits
+ * are recognised, and records sessions (switched on in the PostHog project). Declining later, from
+ * "cookie settings", stops it, deletes what it stored in the browser and reloads the page.
  *
  * Events (besides PostHog's own $pageview, $pageleave, $autocapture and $exception):
  *   section_viewed           a section reaches the middle of the screen, once per visit   { section }
@@ -26,16 +28,18 @@ const posthogKey = import.meta.env.VITE_POSTHOG_KEY;
 const posthogHost = import.meta.env.VITE_POSTHOG_HOST;
 const isPosthogConfigured = Boolean(posthogKey && posthogHost);
 
+let started = false;
+
 /** Dedicated PostHog Logs emitter; existing application logging remains local. */
 export const posthogLogger = {
   info(message: string, attributes?: Parameters<typeof posthog.logger.info>[1]) {
-    if (isPosthogConfigured) posthog.logger.info(message, attributes);
+    if (started) posthog.logger.info(message, attributes);
   },
 };
 
-/** Sends an event; does nothing when PostHog isn't configured (local dev without keys). */
+/** Sends an event; does nothing until the visitor has accepted (or when PostHog isn't configured). */
 export function track(event: string, properties?: Record<string, unknown>) {
-  if (isPosthogConfigured) posthog.capture(event, properties);
+  if (started) posthog.capture(event, properties);
 }
 
 // ── where on the page something happened ──────────────────────────────────────────────────────────────
@@ -49,7 +53,7 @@ export function sectionOf(el: Element | null): string {
   if (el.closest('nav[aria-label="Menu"]')) return "menu";
   if (el.closest("header")) return "nav";
   if (el.closest("footer")) return "footer";
-  // innermost section wins: the tour sits inside the timeline
+  // innermost section wins
   for (let n: Element | null = el; n; n = n.parentElement) if (n.id && SECTIONS.has(n.id)) return n.id;
   return "intro";
 }
@@ -59,6 +63,7 @@ const labelOf = (a: HTMLAnchorElement) => (a.getAttribute("aria-label") || a.tex
 
 /** Every link click, sorted by where it goes. Links with their own event set data-track and are skipped. */
 function onLinkClick(e: MouseEvent) {
+  if (!started) return;
   const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
   if (!a || a.dataset.track) return;
   const href = a.getAttribute("href") ?? "";
@@ -72,7 +77,8 @@ function onLinkClick(e: MouseEvent) {
 
 /**
  * section_viewed, once per section per visit: whichever section is in the middle of the screen. Checked on
- * scroll (once per frame) rather than with observers, so sections that mount late are still counted.
+ * scroll (at most every 150ms) rather than with observers, so sections that mount late are still counted.
+ * Sections passed before the visitor accepted are counted when they're next reached.
  */
 export function watchSections() {
   if (!isPosthogConfigured) return () => {};
@@ -80,21 +86,24 @@ export function watchSections() {
   let timer = 0;
   const check = () => {
     timer = 0;
+    if (!started) return;
     const id = sectionOf(document.elementFromPoint(window.innerWidth / 2, window.innerHeight / 2));
     if (SECTIONS.has(id) && !seen.has(id)) { seen.add(id); track("section_viewed", { section: id }); }
   };
-  // at most every 150ms while scrolling, and once more where the scroll stops
   const onScroll = () => { if (!timer) timer = window.setTimeout(check, 150); };
   window.addEventListener("scroll", onScroll, { passive: true });
   const t = window.setTimeout(check, 1000);
   return () => { window.removeEventListener("scroll", onScroll); window.clearTimeout(timer); window.clearTimeout(t); };
 }
 
-if (isPosthogConfigured) {
+// ── starting and stopping with consent ────────────────────────────────────────────────────────────────
+function start() {
+  if (started || !isPosthogConfigured) return;
+  started = true;
   posthog.init(posthogKey!, {
     api_host: posthogHost!,
-    persistence: "memory", // no cookies or localStorage: no consent banner needed
     person_profiles: "identified_only",
+    cross_subdomain_cookie: false, // the cookie stays on this site, not on every exponential.vc subdomain
     logs: {
       serviceName: "hyperjump-landing",
       environment: import.meta.env.MODE,
@@ -105,12 +114,46 @@ if (isPosthogConfigured) {
       capture_console_errors: false,
     },
   });
-  document.addEventListener("click", onLinkClick, { capture: true });
   if (import.meta.env.DEV) (window as unknown as { posthog: typeof posthog }).posthog = posthog; // for checking events locally
   posthogLogger.info("landing_page_initialized", { runtime: "browser" });
-} else if (import.meta.env.DEV) {
-  const missingVariable = posthogKey ? "VITE_POSTHOG_HOST" : "VITE_POSTHOG_KEY";
-  console.warn(`PostHog is off: ${missingVariable} isn't set, so no events are sent. See .env.example.`);
+}
+
+/** Deletes PostHog's cookie and browser storage. */
+function purge() {
+  try {
+    for (const store of [localStorage, sessionStorage]) {
+      for (const k of Object.keys(store)) if (k.startsWith("ph_") || k.startsWith("__ph")) store.removeItem(k);
+    }
+  } catch { /* storage blocked */ }
+  for (const c of document.cookie.split(";")) {
+    const name = c.split("=")[0]!.trim();
+    if (name.startsWith("ph_") || name.startsWith("__ph")) document.cookie = `${name}=; Max-Age=0; path=/`;
+  }
+}
+
+/**
+ * Consent withdrawn: stop capturing and reload, so the recorder stops too. PostHog writes its storage
+ * again as the page unloads, so the clean-up happens on the next load (below), where nothing is running.
+ */
+function stop() {
+  if (!started) return;
+  posthog.opt_out_capturing();
+  location.reload();
+}
+
+if (typeof window !== "undefined") {
+  document.addEventListener("click", onLinkClick, { capture: true });
+  if (getConsent() === "granted") start();
+  else purge(); // no consent (or withdrawn): nothing of PostHog's stays in the browser
+  onConsentChange(() => {
+    const c = getConsent();
+    if (c === "granted") start();
+    else if (c === "denied") stop();
+  });
+  if (!isPosthogConfigured && import.meta.env.DEV) {
+    const missingVariable = posthogKey ? "VITE_POSTHOG_HOST" : "VITE_POSTHOG_KEY";
+    console.warn(`PostHog is off: ${missingVariable} isn't set, so no events are sent. See .env.example.`);
+  }
 }
 
 export default posthog;
