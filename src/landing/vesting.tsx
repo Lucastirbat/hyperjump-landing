@@ -1,5 +1,6 @@
 import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { cn } from "@/lib/utils";
+import { track as trackEvent } from "@/lib/posthog";
 import { IGNITION } from "./parts";
 
 /*
@@ -21,6 +22,13 @@ export function VestingRuler({ className }: { className?: string }) {
   const track = useRef<HTMLDivElement>(null);
 
   const last = useRef(month);
+  // analytics: where the ruler was left, once per drag or key press, only when it changed
+  const reported = useRef(month);
+  const report = (m: number, input: "pointer" | "keyboard") => {
+    if (m === reported.current) return;
+    reported.current = m;
+    trackEvent("vesting_ruler_moved", { month: m, vested_pct: Number(vested(m).toFixed(2)), input });
+  };
   const fromPointer = (e: PointerEvent) => {
     const r = track.current?.getBoundingClientRect(); if (!r || !r.width) return;
     const m = Math.round(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * MONTHS);
@@ -58,7 +66,7 @@ export function VestingRuler({ className }: { className?: string }) {
         ref={track}
         onPointerDown={down}
         onPointerMove={(e) => dragging && fromPointer(e)}
-        onPointerUp={() => setDragging(false)}
+        onPointerUp={() => { setDragging(false); report(last.current, "pointer"); }}
         onPointerCancel={() => setDragging(false)}
         className={cn("group absolute inset-x-0 top-[22px] h-7 touch-pan-y select-none", dragging ? "cursor-grabbing" : "cursor-grab")}
       >
@@ -80,6 +88,7 @@ export function VestingRuler({ className }: { className?: string }) {
           aria-valuenow={month}
           aria-valuetext={`${label(month)}: ${fmt(month)} of ${TOTAL}% vested`}
           onKeyDown={key}
+          onKeyUp={() => report(month, "keyboard")}
           className={cn("absolute top-[13.5px] -ml-[7px] -mt-[7px] flex size-[14px] items-center justify-center rounded-full", !dragging && "transition-[left] duration-200 ease-out")}
           style={{ left: `calc(${at(month)} + 0.5px)` }}
         >

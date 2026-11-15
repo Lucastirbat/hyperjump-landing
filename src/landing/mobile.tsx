@@ -4,6 +4,8 @@ import { JumpLink } from "@/components/hyperspace";
 import { EXPONENTIAL_HREF, HERO_SUB, HERO_TITLE, STEPS, TIPS } from "./content";
 import { TimelineStack, TOUR_ANCHOR } from "./timeline";
 import { VestingRuler } from "./vesting";
+import { track } from "@/lib/posthog";
+import { scrollToTop } from "@/lib/scroll";
 import { CountUp } from "./motion";
 import { Arrival } from "./arrival";
 import { Ill } from "./ill";
@@ -153,14 +155,14 @@ function MHeader() {
           <img src="/landing/el/wordmark.svg" alt="" width={100} height={10} className="block" />
         </a>
         <JumpLink to="/sign-in" className="ml-auto flex w-24 items-center justify-center text-[18px] leading-[21px] font-black text-white" style={{ background: IGNITION, ...ORBITRON }}>apply</JumpLink>
-        <button type="button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)} className="flex w-14 items-center justify-center">
+        <button type="button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => { if (!open) track("mobile_menu_opened"); setOpen((o) => !o); }} className="flex w-14 items-center justify-center">
           <svg viewBox="0 0 22 12" width={22} height={12} aria-hidden>
             <path d={open ? "M3 0l16 12M3 12L19 0" : "M0 1H22M0 11H22"} stroke={DUNE} strokeWidth={1.5} className="transition-all" />
           </svg>
         </button>
       </div>
       {open && (
-        <nav aria-label="Menu" className="fixed inset-x-0 bottom-0 top-14 overflow-y-auto bg-[#1f1f1f] px-5 pb-10 pt-6 animate-[hjfade_250ms_ease-out]">
+        <nav aria-label="Menu" data-lenis-prevent className="fixed inset-x-0 bottom-0 top-14 overflow-y-auto bg-[#1f1f1f] px-5 pb-10 pt-6 animate-[hjfade_250ms_ease-out]">
           <div className="mx-auto max-w-[520px]">
             {MENU.map(([label, href], i) => (
               <a key={href} href={href} onClick={() => setOpen(false)} className="flex items-center gap-4 border-b py-4" style={{ borderColor: LINE }}>
@@ -529,7 +531,7 @@ function MFaq() {
             const isOpen = open === i;
             return (
               <div key={q} className="relative" style={{ background: DUNE }}>
-                <button type="button" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? -1 : i)} className="flex w-full items-start justify-between gap-4 px-5 py-5 text-left">
+                <button type="button" aria-expanded={isOpen} onClick={() => { if (!isOpen) track("faq_opened", { question: q, position: i + 1 }); setOpen(isOpen ? -1 : i); }} className="flex w-full items-start justify-between gap-4 px-5 py-5 text-left">
                   <span className={cn(display, "text-[16px] leading-[22px] text-[#1f1f1f]")}>{q}</span>
                   <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-full transition-colors", isOpen ? "bg-[#262626]" : "bg-[#e0dedb]")}>
                     <svg viewBox="0 0 12 12" className="size-3" aria-hidden>
@@ -554,7 +556,7 @@ function MFaq() {
 function MFooter({ shipUrl, shipTone }: { shipUrl: string; shipTone?: number }) {
   return (
     <footer className="border-t bg-[#1f1f1f]" style={{ borderColor: LINE }}>
-      <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="flex h-16 w-full items-center gap-3 border-b px-5 text-[13px] font-normal text-[#bbbbb5]" style={{ borderColor: LINE }}>
+      <button type="button" onClick={scrollToTop} className="flex h-16 w-full items-center gap-3 border-b px-5 text-[13px] font-normal text-[#bbbbb5]" style={{ borderColor: LINE }}>
         <svg viewBox="0 0 16 16" className="size-4 opacity-50" aria-hidden><path d="M4 8l4-4 4 4M4 13l4-4 4 4" stroke={STONE} strokeWidth={1.2} fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
         back to top
       </button>

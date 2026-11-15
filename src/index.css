@@ -11,6 +11,8 @@
 @layer base {
   html, body { background: #262626; color: #bbbbb5; }
   html { scroll-behavior: smooth; }
+  html.lenis { scroll-behavior: auto; } /* Lenis animates the scroll itself */
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   body {
     font-family: var(--font-sans);
     font-weight: 300;

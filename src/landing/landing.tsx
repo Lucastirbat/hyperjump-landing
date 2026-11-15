@@ -7,6 +7,8 @@ import type { Tip } from "./ship-scene";
 import { EXPONENTIAL_HREF, HERO_SUB, HERO_TITLE, STEPS, TIPS } from "./content";
 import { Footer, Middle } from "./sections";
 import { LandingMobile } from "./mobile";
+import { watchSections } from "@/lib/posthog";
+import { startSmoothScroll } from "@/lib/scroll";
 import { Box, chamfer, chamferAll, Corners, DUNE, Frame, IGNITION, IconMail, IconSearch, IconShare, IconShield, INK, LINE, MIST, ORBITRON, PATTERN, Row, TagStrip, display } from "./parts";
 
 const ShipScene = lazy(() => import("./ship-scene"));
@@ -124,7 +126,12 @@ export function LandingPage() {
   // Below 1024px the page switches to the one-column mobile layout (Figma "Landing / Mobile 390").
   const mobile = useMedia("(max-width: 1023px)");
   useLaunchLock(launched, reducedMotion, mobile);
+  // after the launch lock, so the lock sees each wheel event first (see lib/scroll.ts)
+  useEffect(() => startSmoothScroll(), []);
   const scale = useDesktopScale();
+
+  // analytics: which sections people reach (re-armed when the layout switches between phone and desktop)
+  useEffect(() => watchSections(), [mobile]);
 
   useEffect(() => {
     document.title = "hyperjump";

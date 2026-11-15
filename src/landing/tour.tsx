@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type RefObject } from "react";
-import posthog from "@/lib/posthog";
+import { track } from "@/lib/posthog";
 import { cn } from "@/lib/utils";
 import { chamfer, chamferAll, display, DUNE, IGNITION, INK, MIST, ORBITRON } from "./parts";
 import { COUNTRIES, GRATICULE, GRATICULE_LABELS, PROJ } from "./tour-geo";
@@ -269,12 +269,12 @@ export function TourMap({ tour, shipSrc, selected, onSelect }: { tour: Tour; shi
   }, [selected]);
   const selectStop = (index: number, source: "map_country" | "map_stop") => {
     const stop = tour.stops[index]!;
-    posthog.capture("tour_stop_selected", { city: stop.city, country: stop.country, source });
+    track("tour_stop_selected", { city: stop.city, country: stop.country, source });
     onSelect(index);
   };
   const pickCountry = (name: string) => {
     const stop = tour.stops.findIndex((s) => geoName(s.country) === name);
-    posthog.capture("tour_country_selected", { country: countryName(name), has_scheduled_stop: stop !== -1 });
+    track("tour_country_selected", { country: countryName(name), has_scheduled_stop: stop !== -1 });
     if (stop !== -1) {
       setPicked(null);
       if (stop === selected) flyTo(ship, pts[stop]!); else selectStop(stop, "map_country");
@@ -482,6 +482,8 @@ export function StopDetails({ tour, selected, className }: { tour: Tour; selecte
           href={s.lumaUrl ?? "#"}
           target={s.lumaUrl ? "_blank" : undefined}
           rel={s.lumaUrl ? "noopener noreferrer" : undefined}
+          data-track="rsvp"
+          onClick={() => track("tour_rsvp_clicked", { city: s.city, country: s.country, has_link: Boolean(s.lumaUrl) })}
           className="mt-[23px] flex h-[45px] w-[264px] max-w-full items-center justify-center text-[13px] leading-[21px] font-bold text-[#f5f3f0] opacity-95 transition-opacity hover:opacity-100"
           style={{ background: INK, clipPath: chamfer(16), ...ORBITRON }}
         >
@@ -517,7 +519,7 @@ export function StopList({ tour, selected, onSelect, rows, className }: { tour: 
   const fade = `linear-gradient(to bottom, ${edge.top ? "transparent" : "#000"}, #000 28px, #000 calc(100% - 40px), ${edge.bottom ? "transparent" : "#000"})`;
   const selectStop = (index: number) => {
     const stop = tour.stops[index]!;
-    posthog.capture("tour_stop_selected", { city: stop.city, country: stop.country, source: "stop_list" });
+    track("tour_stop_selected", { city: stop.city, country: stop.country, source: "stop_list" });
     onSelect(index);
   };
   return (
@@ -525,6 +527,7 @@ export function StopList({ tour, selected, onSelect, rows, className }: { tour: 
       <p className="text-[13px] leading-[21px] text-[#1f1f1f]/66">all {tour.stops.length} stops{capped && <span className="text-[#1f1f1f]/40"> // scroll for more</span>}</p>
       <div
         ref={scroller}
+        data-lenis-prevent
         onScroll={capped ? measure : undefined}
         className={cn("mt-2.5", capped && "-mx-2 overflow-y-auto overscroll-contain px-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden")}
         style={capped ? { height: rows * ROW_H + 1, maskImage: fade, WebkitMaskImage: fade } : undefined}

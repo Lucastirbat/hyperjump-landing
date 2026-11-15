@@ -1,5 +1,5 @@
 import "@fontsource-variable/orbitron";
-import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { JumpLink } from "@/components/hyperspace";
 import * as ART from "./art";
@@ -13,6 +13,8 @@ import { bandHeight, CrewCard, Pit, PIT_H, STATIONS, useCrewPhotos } from "./cre
 import { shipTopFor, StopDetails, StopList, TOUR_WHY, TourMap, useSelectedStop, useTour } from "./tour";
 import { BENTO_H, TimelineBento, TOUR_ANCHOR } from "./timeline";
 import { VestingRuler } from "./vesting";
+import { track } from "@/lib/posthog";
+import { scrollToTop } from "@/lib/scroll";
 import { CountUp } from "./motion";
 import { Arrival } from "./arrival";
 
@@ -26,8 +28,10 @@ const INK80 = "rgba(31,31,31,0.8)", INK66 = "rgba(31,31,31,0.66)", INK25 = "rgba
 const SOFT = "rgba(70,70,70,0.14)", FAINT = "rgba(46,46,46,0.1)";
 const GAP = 80;
 
-const FAQ_LIST_H = 700; // two columns (six and five); room for the longest answer open
-const FAQ_H = 212 + FAQ_LIST_H + 36;
+/** The question box hugs its questions: this is its height on first paint (first answer open); the real
+ *  height is measured as answers open and close, and the page below moves with it. */
+const FAQ_LIST_H = 676;
+const faqHeight = (listH: number) => 212 + listH + 36;
 
 /** Section order; `rules` are extra full-width lines inside a section (its own 40px gaps). */
 const BLOCKS = [
@@ -128,12 +132,26 @@ export function Middle({ shipUrl, shipTone }: { shipUrl: string; shipTone?: numb
   const startups = useMemo(() => jumpers.data ?? [], [jumpers.data]);
   const startupCount = jumpers.data ? startups.length : jumpers.isError ? 0 : STARTUPS_FALLBACK;
   const [bentoH, setBentoH] = useState(BENTO_H);
+  const [faqListH, setFaqListH] = useState(FAQ_LIST_H);
 
-  const heights: Record<BlockId, number> = { who: WHO_H, get: 1041, crew: CREW_H, past: pastHeight(startupCount), timeline: bentoH + GAP + TOUR_H, conditions: 760, faq: FAQ_H };
+  const heights: Record<BlockId, number> = { who: WHO_H, get: 1041, crew: CREW_H, past: pastHeight(startupCount), timeline: bentoH + GAP + TOUR_H, conditions: 760, faq: faqHeight(faqListH) };
   const tops = {} as Record<BlockId, number>;
   let y = GAP;
   for (const b of BLOCKS) { tops[b.id] = y; y += heights[b.id] + GAP; }
   const middleH = y; // after the last section, the same 80px gap before the footer
+  // everything above the FAQ, kept as the same elements while an answer opens (its height changes every
+  // frame of the animation): those sections then skip re-rendering
+  const pastH = heights.past;
+  const above = useMemo(() => (
+    <>
+      <WhoFor />
+      <WhatYouGet />
+      <PitCrew shipUrl={shipUrl} shipTone={shipTone} />
+      <PastJumpers h={pastH} startups={startups} pending={jumpers.isPending} count={startupCount} />
+      <Timeline shipUrl={shipUrl} bentoH={bentoH} onBento={setBentoH} />
+      <Conditions />
+    </>
+  ), [shipUrl, shipTone, pastH, startups, jumpers.isPending, startupCount, bentoH]);
   const rules = [...BLOCKS.flatMap((b) => [tops[b.id], tops[b.id] + heights[b.id] - 1, ...b.rules.map((r) => tops[b.id] + r)]), tops.timeline + bentoH, tops.timeline + bentoH + GAP];
 
   return (
@@ -143,13 +161,8 @@ export function Middle({ shipUrl, shipTone }: { shipUrl: string; shipTone?: numb
           <SideNav />
         </Box>
         <Box x={260} y={0} w={1140} h={middleH} className="pointer-events-none border-x" style={line} />
-        <WhoFor />
-        <WhatYouGet />
-        <PitCrew shipUrl={shipUrl} shipTone={shipTone} />
-        <PastJumpers h={heights.past} startups={startups} pending={jumpers.isPending} count={startupCount} />
-        <Timeline shipUrl={shipUrl} bentoH={bentoH} onBento={setBentoH} />
-        <Conditions />
-        <Faq />
+        {above}
+        <Faq listH={faqListH} onList={setFaqListH} />
       </Row>
     </TopsCtx.Provider>
   );
@@ -468,14 +481,24 @@ export const FAQS = [
   ["why “hyperjump”?", "because some founders don’t grow linearly, but exponentially. for them, it’s like coming out of hyperspace at the right time, in the right place."],
 ];
 
-function Faq() {
+function Faq({ listH, onList }: { listH: number; onList: (h: number) => void }) {
   const [open, setOpen] = useState(0);
+  const list = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = list.current; if (!el) return;
+    const report = () => onList(el.offsetHeight);
+    report();
+    const ro = new ResizeObserver(report);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [onList]);
+  const h = faqHeight(listH);
   const item = (i: number) => {
     const [q, a] = FAQS[i]!;
     const isOpen = open === i;
     return (
       <div key={q} style={{ background: DUNE }}>
-        <button type="button" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? -1 : i)} className={cn("flex w-full items-start justify-between gap-6 px-7 pt-8 text-left transition-[padding] duration-300", isOpen ? "pb-6" : "pb-[33px]")}>
+        <button type="button" aria-expanded={isOpen} onClick={() => { if (!isOpen) track("faq_opened", { question: q, position: i + 1 }); setOpen(isOpen ? -1 : i); }} className={cn("flex w-full items-start justify-between gap-6 px-7 pt-8 text-left transition-[padding] duration-300", isOpen ? "pb-6" : "pb-[33px]")}>
           <span className={cn(display, "text-[16px] leading-6 text-[#1f1f1f]")}>{q}</span>
           <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-full transition-colors", isOpen ? "bg-[#262626]" : "bg-[#e0dedb]")}>
             <svg viewBox="0 0 12 12" className="size-3" aria-hidden>
@@ -491,15 +514,15 @@ function Faq() {
     );
   };
   return (
-    <Section id="faq" h={FAQ_H}>
-      <Panel h={FAQ_H} />
+    <Section id="faq" h={h}>
+      <Panel h={h} />
       <TagStrip x={296} y={36} w={1068} label="faq" dark />
       <Box x={296} y={116} as="h2" className={cn(display, "text-[40px] leading-[48px] tracking-[-0.03em] text-[#1f1f1f]")}>Frequently Asked Questions</Box>
       <span className="absolute top-[128px] text-[13px] leading-[21px] text-[#1f1f1f]" style={{ right: 1440 - 1203 }}>still have questions? ask the team.</span>
       <Button x={1227} y={116} w={137} href={CONTACT_HREF}>contact us</Button>
-      <Box x={296} y={212} w={1068} h={FAQ_LIST_H} style={{ background: MIST }}>
+      <Box x={296} y={212} w={1068} h={listH} style={{ background: MIST }}>
         <div className="absolute inset-0 opacity-25" style={{ backgroundImage: PATTERN.hatch("#2e2e2e") }} />
-        <div className="relative grid grid-cols-2 items-start gap-2 p-2">
+        <div ref={list} className="relative grid grid-cols-2 items-start gap-2 p-2">
           <div className="flex flex-col gap-2">{[0, 1, 2, 3, 4, 5].map(item)}</div>
           <div className="flex flex-col gap-2">{[6, 7, 8, 9, 10].map(item)}</div>
         </div>
@@ -535,6 +558,7 @@ function LinkList({ x, title, items }: { x: number; title: string; items: string
 export function Footer({ shipUrl, shipTone }: { shipUrl: string; shipTone?: number }) {
   const line = { borderColor: LINE } as const;
   return (
+    <footer>
     <Row
       height={1179}
       className="bg-[#1f1f1f]"
@@ -548,7 +572,7 @@ export function Footer({ shipUrl, shipTone }: { shipUrl: string; shipTone?: numb
       <Box x={810} y={614} w={40} h={40} className="border-x" style={line} />
       <Box x={40} y={1099} w={1360} h={80} className="border-x" style={line} />
 
-      <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="absolute left-[65px] top-[90px] flex items-center gap-[20px] text-[13px] leading-[21px] font-normal text-[#bbbbb5] hover:text-[#f5f3f0]">
+      <button type="button" onClick={scrollToTop} className="absolute left-[65px] top-[90px] flex items-center gap-[20px] text-[13px] leading-[21px] font-normal text-[#bbbbb5] hover:text-[#f5f3f0]">
         <span aria-hidden className="block size-[21px] opacity-50" dangerouslySetInnerHTML={{ __html: ART.backTop }} />back to top
       </button>
 
@@ -594,5 +618,6 @@ export function Footer({ shipUrl, shipTone }: { shipUrl: string; shipTone?: numb
       <div className="absolute left-[1235px] top-[1132px] h-[15px] w-[101px] opacity-25" style={{ backgroundImage: PATTERN.plus(MIST) }} />
       <img src="/landing/el/hj-mark-white.svg" alt="" width={26} height={37} className="absolute left-[1353px] top-[1120px]" />
     </Row>
+    </footer>
   );
 }
