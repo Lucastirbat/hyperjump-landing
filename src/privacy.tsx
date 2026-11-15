@@ -1,14 +1,15 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ConsentBanner } from "@/components/consent-banner";
-import { PrivacyPage } from "@/privacy/page";
+import { DocPage } from "@/docs/doc-page";
+import policy from "../docs/privacy-policy.md?raw";
 import "./lib/posthog";
 import "./index.css";
 
-// Entry for /privacy (privacy.html): the policy page and the cookie banner, without the landing's 3D.
+// Entry for /privacy (privacy.html): the policy and the cookie banner, without the landing's 3D.
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <PrivacyPage />
+    <DocPage title="privacy policy" markdown={policy} />
     <ConsentBanner />
   </StrictMode>,
 );

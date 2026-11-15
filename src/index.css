@@ -85,4 +85,14 @@ html.hj-crosshair, html.hj-crosshair * { cursor: none !important; }
 .hj-prose table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.5; }
 .hj-prose th { text-align: left; font-weight: 500; color: #1f1f1f; padding: 10px 12px 10px 0; border-bottom: 1px solid rgba(31, 31, 31, 0.25); }
 .hj-prose td { vertical-align: top; padding: 10px 12px 10px 0; border-bottom: 1px solid rgba(31, 31, 31, 0.12); }
-.hj-prose .hj-table { overflow-x: auto; }
+.hj-prose .hj-table { overflow-x: auto; margin-top: 14px; }
+.hj-prose .hj-table table { margin-top: 0; }
+.hj-prose h2, .hj-prose h3 { scroll-margin-top: 84px; }
+.hj-prose ol { margin-top: 14px; padding-left: 22px; list-style: decimal; }
+.hj-prose ol > li { margin-top: 10px; padding-left: 6px; }
+.hj-prose ol > li::marker { color: #6442fd; font-weight: 500; }
+/* wide pages (comparison tables): smaller table type, and a minimum width so phones scroll sideways */
+.hj-prose.is-wide > :not(.hj-table) { max-width: 720px; } /* text keeps a readable measure; only tables go wide */
+.hj-prose.is-wide table { min-width: 960px; font-size: 13px; line-height: 1.45; }
+.hj-prose.is-wide td:first-child { min-width: 128px; color: rgba(31, 31, 31, 0.6); font-size: 12px; }
+.hj-prose.is-wide td:first-child strong { color: #1f1f1f; font-size: 14px; }

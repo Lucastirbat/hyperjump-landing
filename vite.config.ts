@@ -7,24 +7,30 @@ import { defineConfig, type Plugin } from "vite";
 // Point it elsewhere with HJ_API=http://localhost:8787 npm run dev
 const apiTarget = process.env.HJ_API ?? "https://hyperjump.dev";
 
-// /privacy is its own page (privacy.html). Cloudflare serves /privacy from privacy.html; this does the same in dev.
-const privacyRoute: Plugin = {
-  name: "privacy-route",
+// Text pages are their own HTML files (privacy.html, …). Cloudflare serves /privacy from privacy.html;
+// this does the same in dev.
+const PAGES = ["privacy", "incorporation-guide"];
+const pageRoutes: Plugin = {
+  name: "page-routes",
   configureServer(server) {
     server.middlewares.use((req, _res, next) => {
-      if (req.url === "/privacy" || req.url?.startsWith("/privacy?")) req.url = "/privacy.html" + req.url.slice("/privacy".length);
+      const path = req.url?.split(/[?#]/)[0] ?? "";
+      const page = PAGES.find((p) => path === `/${p}`);
+      if (page) req.url = `/${page}.html` + req.url!.slice(path.length);
       next();
     });
   },
 };
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), privacyRoute],
+  plugins: [react(), tailwindcss(), pageRoutes],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
   server: { port: 5180, proxy: { "/api": { target: apiTarget, changeOrigin: true } } },
   build: {
     outDir: "dist",
     emptyOutDir: true,
-    rollupOptions: { input: { main: fileURLToPath(new URL("./index.html", import.meta.url)), privacy: fileURLToPath(new URL("./privacy.html", import.meta.url)) } },
+    rollupOptions: {
+      input: Object.fromEntries([["main", "index"], ...PAGES.map((p) => [p, p])].map(([k, f]) => [k, fileURLToPath(new URL(`./${f}.html`, import.meta.url))])),
+    },
   },
 });

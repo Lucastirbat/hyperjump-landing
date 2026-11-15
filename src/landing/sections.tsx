@@ -280,7 +280,7 @@ function Timeline({ shipUrl, bentoH, onBento }: { shipUrl: string; bentoH: numbe
 
 // ── 03 conditions ───────────────────────────────────────────────────────────
 // TODO: link the incorporation guide once it's written.
-export const GUIDE_HREF = "#";
+export const GUIDE_HREF = "/incorporation-guide";
 export const CONDITIONS = [
   { title: "be under 26 when you apply", body: "or at least one of your co-founders is under 26. you can apply while enrolled in university, masters or phd and we don’t expect you to drop out to participate." },
   { title: "apply solo or as a team of up to 3", body: "why limit to 3? in our experience, 4 is one too many and roles become harder to figure out. we believe you can now build massive companies with small, fierce teams." },
