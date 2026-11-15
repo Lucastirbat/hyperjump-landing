@@ -16,4 +16,4 @@ export const HERO_SUB = ["apply and get $75K investment and one month in San Fra
 export const STEPS = ["decide if you go solo or with a team", "fill your application online", "meet us in-person in your home country", "get selected and travel to san francisco"];
 
 // TODO: link "read more" to exponential's page once the URL is confirmed.
-export const EXPONENTIAL_HREF = "#";
+export const EXPONENTIAL_HREF = "https://exponential.vc";

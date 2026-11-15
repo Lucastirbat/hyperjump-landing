@@ -94,7 +94,8 @@ function ArtSquare({ size, name, w, h }: { size: number; name: Parameters<typeof
 }
 
 function DarkButton({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
-  return <a href={href} className={cn("flex h-[45px] w-full items-center justify-center text-[13px] leading-[21px] font-medium text-[#f5f3f0] opacity-90 transition-opacity active:opacity-100", className)} style={{ background: "#262626", clipPath: chamfer(16) }}>{children}</a>;
+  const ext = href.startsWith("http"); // other sites open in a new tab
+  return <a href={href} target={ext ? "_blank" : undefined} rel={ext ? "noopener noreferrer" : undefined} className={cn("flex h-[45px] w-full items-center justify-center text-[13px] leading-[21px] font-medium text-[#f5f3f0] opacity-90 transition-opacity active:opacity-100", className)} style={{ background: "#262626", clipPath: chamfer(16) }}>{children}</a>;
 }
 
 function Check() {
@@ -198,12 +199,21 @@ function MHero({ ship, progress, launched, tipEls, reducedMotion }: { ship: Ship
         <Suspense fallback={null}>
           <ShipScene compact model={ship.url} tone={ship.tone} progress={progress} launched={launched} tips={TIPS} tipEls={tipEls} reducedMotion={reducedMotion} />
         </Suspense>
+        {/* numbered markers, pinned to the ship's anchors by the 3D scene; each matches a cell below */}
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          {TIPS.map((t, i) => (
+            <div key={t.anchor} ref={(el) => { tipEls.current[i] = el; }} className="absolute left-0 top-0 opacity-0 will-change-transform">
+              <span className="absolute -left-[3px] -top-[3px] size-1.5 rounded-full bg-[#9999FF] shadow-[0_0_10px_2px_rgba(153,153,255,0.7)]" />
+              <TipNo n={i + 1} className="absolute left-[7px] top-[-22px]" />
+            </div>
+          ))}
+        </div>
       </div>
-      {/* what you get, in four: a 2×2 grid under the ship (no markers on the ship itself) */}
+      {/* what you get, in four: a 2×2 grid under the ship, numbered like the markers on it */}
       <ul className="grid grid-cols-2 gap-px border-y" style={{ background: LINE, borderColor: LINE }}>
         {TIPS.map((t) => (
           <li key={t.anchor} className="bg-[#262626] px-5 py-4">
-            <p className={cn(display, "text-[16px] leading-[21px] text-[#f5f3f0]")}>{t.title}</p>
+            <p className={cn(display, "flex items-center gap-2 text-[16px] leading-[21px] text-[#f5f3f0]")}><TipNo n={TIPS.indexOf(t) + 1} />{t.title}</p>
             <p className="mt-1 text-[13px] leading-[19px]">{t.body}</p>
           </li>
         ))}
@@ -211,6 +221,11 @@ function MHero({ ship, progress, launched, tipEls, reducedMotion }: { ship: Ship
       <div className="h-8" />
     </section>
   );
+}
+
+/** The small numbered ring that ties a marker on the ship to its cell under it. */
+function TipNo({ n, className }: { n: number; className?: string }) {
+  return <span className={cn("flex size-[18px] shrink-0 items-center justify-center rounded-full border bg-[#1e1d2a]/80 text-[11px] leading-none font-medium text-[#f5f3f0] tabular-nums", className)} style={{ borderColor: "rgba(153,153,255,0.7)" }}>{n}</span>;
 }
 
 // ── overview ────────────────────────────────────────────────────────────────

@@ -26,7 +26,7 @@ const INK80 = "rgba(31,31,31,0.8)", INK66 = "rgba(31,31,31,0.66)", INK25 = "rgba
 const SOFT = "rgba(70,70,70,0.14)", FAINT = "rgba(46,46,46,0.1)";
 const GAP = 80;
 
-const FAQ_LIST_H = 600; // two columns of five; room for the longest answer open
+const FAQ_LIST_H = 700; // two columns (six and five); room for the longest answer open
 const FAQ_H = 212 + FAQ_LIST_H + 36;
 
 /** Section order; `rules` are extra full-width lines inside a section (its own 40px gaps). */
@@ -457,6 +457,7 @@ function PastJumpers({ h, startups, pending, count }: { h: number; startups: Sta
 export const FAQS = [
   ["i don’t have an olympiad medal. should i still apply?", "yes. the medal is a signal, not a requirement. if you’ve built something serious, show us."],
   ["i don’t have a company yet. is that a problem?", "no. you need a team (or just you) and something you’re obsessed with building. you’ll incorporate during the prep phase."],
+  ["is there a limit per city or country?", "no. there’s no quota for any city or country. we pick the strongest builders, wherever they’re from."],
   ["what’s a SAFE?", "a simple agreement for future equity. we give you money now, and it turns into shares when you raise your next round. our $75K for 5% works out to a $1.5M post-money valuation cap."],
   ["what does the pit crew actually do?", "whatever your company needs most: product, engineering, fundraising, hiring, legal setup, intros. they work with you through the program and after it."],
   ["do i have to move to san francisco?", "for one month, yes. after that, build wherever you want."],
@@ -499,8 +500,8 @@ function Faq() {
       <Box x={296} y={212} w={1068} h={FAQ_LIST_H} style={{ background: MIST }}>
         <div className="absolute inset-0 opacity-25" style={{ backgroundImage: PATTERN.hatch("#2e2e2e") }} />
         <div className="relative grid grid-cols-2 items-start gap-2 p-2">
-          <div className="flex flex-col gap-2">{[0, 1, 2, 3, 4].map(item)}</div>
-          <div className="flex flex-col gap-2">{[5, 6, 7, 8, 9].map(item)}</div>
+          <div className="flex flex-col gap-2">{[0, 1, 2, 3, 4, 5].map(item)}</div>
+          <div className="flex flex-col gap-2">{[6, 7, 8, 9, 10].map(item)}</div>
         </div>
       </Box>
     </Section>

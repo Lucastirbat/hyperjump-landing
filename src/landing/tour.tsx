@@ -530,11 +530,11 @@ export function StopList({ tour, selected, onSelect, rows, className }: { tour: 
                 >
                   <span className="w-7 text-[#1f1f1f]/25">{String(i + 1).padStart(2, "0")}</span>
                   <span className="mr-[7px] flex w-[7px] justify-center">
-                    {st === "next" ? <span className="size-2 rounded-full" style={{ background: IGNITION }} />
+                    {selected === i ? <span className="size-2 rounded-full" style={{ background: IGNITION }} />
                       : st === "visited" ? <span className="size-1.5 rounded-full" style={{ background: INK }} />
                       : <span className="size-[7px] rounded-full border-[1.25px] border-[#1f1f1f]/60" />}
                   </span>
-                  <span className={cn("w-[102px] text-[#1f1f1f]", st === "next" && "font-medium")}>{s.city}</span>
+                  <span className={cn("w-[102px] text-[#1f1f1f]", selected === i && "font-medium")}>{s.city}</span>
                   <span className="text-[#1f1f1f]/66">{s.country}</span>
                   <span className="ml-auto text-[#1f1f1f]/80">{shortDate(s.date)}</span>
                 </button>

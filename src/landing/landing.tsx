@@ -342,7 +342,7 @@ function Banner() {
         <span style={{ color: INK }}>hyperjump is the first step for founders who want to grow with us.</span>
       </Box>
       <img src="/landing/el/exponential.svg" alt="exponential" width={207} height={69} className="absolute left-[1157px] top-[102px]" />
-      <a href={EXPONENTIAL_HREF} className="absolute left-[1151px] top-[191px] flex h-[45px] w-[213px] items-center justify-center text-[13px] leading-[21px] font-medium text-[#f5f3f0] opacity-90 transition-opacity hover:opacity-100" style={{ background: "#262626", clipPath: chamfer(16) }}>
+      <a href={EXPONENTIAL_HREF} target="_blank" rel="noopener noreferrer" className="absolute left-[1151px] top-[191px] flex h-[45px] w-[213px] items-center justify-center text-[13px] leading-[21px] font-medium text-[#f5f3f0] opacity-90 transition-opacity hover:opacity-100" style={{ background: "#262626", clipPath: chamfer(16) }}>
         read more
       </a>
     </Row>
