@@ -520,11 +520,16 @@ function Faq({ listH, onList }: { listH: number; onList: (h: number) => void }) 
       <Box x={296} y={116} as="h2" className={cn(display, "text-[40px] leading-[48px] tracking-[-0.03em] text-[#1f1f1f]")}>Frequently Asked Questions</Box>
       <span className="absolute top-[128px] text-[13px] leading-[21px] text-[#1f1f1f]" style={{ right: 1440 - 1203 }}>still have questions? ask the team.</span>
       <Button x={1227} y={116} w={137} href={CONTACT_HREF}>contact us</Button>
-      <Box x={296} y={212} w={1068} h={listH} style={{ background: MIST }}>
-        <div className="absolute inset-0 opacity-25" style={{ backgroundImage: PATTERN.hatch("#2e2e2e") }} />
-        <div ref={list} className="relative grid grid-cols-2 items-start gap-2 p-2">
-          <div className="flex flex-col gap-2">{[0, 1, 2, 3, 4, 5].map(item)}</div>
-          <div className="flex flex-col gap-2">{[6, 7, 8, 9, 10].map(item)}</div>
+      {/* each column has its own hatched frame that hugs it, so the shorter one leaves no empty hatch below;
+          side by side they share an 8px hatched gutter, as one frame would */}
+      <Box x={296} y={212} w={1068} h={listH}>
+        <div ref={list} className="grid grid-cols-2 items-start">
+          {[[0, 1, 2, 3, 4, 5], [6, 7, 8, 9, 10]].map((col, k) => (
+            <div key={k} className={cn("relative py-2", k === 0 ? "pl-2 pr-1" : "pl-1 pr-2")} style={{ background: MIST }}>
+              <div className="absolute inset-0 opacity-25" style={{ backgroundImage: PATTERN.hatch("#2e2e2e") }} />
+              <div className="relative flex flex-col gap-2">{col.map(item)}</div>
+            </div>
+          ))}
         </div>
       </Box>
     </Section>
