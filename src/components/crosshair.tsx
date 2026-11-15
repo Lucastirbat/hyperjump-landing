@@ -13,6 +13,7 @@ export function Crosshair() {
   const h = useRef<HTMLDivElement>(null);
   const v = useRef<HTMLDivElement>(null);
   const r = useRef<HTMLDivElement>(null);
+  const f = useRef<HTMLDivElement>(null); // the frame around a hovered button: pinned to the element, not the pointer
 
   useEffect(() => {
     const el = root.current;
@@ -33,12 +34,11 @@ export function Crosshair() {
       v.current!.style.transform = `translate3d(${x}px, 0, 0)`;
       r.current!.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       if (target) {
-        // corner offsets from the pointer, in the brackets' own frame (each sits 10px from its corner)
-        const b = target.getBoundingClientRect();
-        el.style.setProperty("--fl", `${b.left - PAD - x + 10}px`);
-        el.style.setProperty("--fr", `${b.right + PAD - x - 10}px`);
-        el.style.setProperty("--ft", `${b.top - PAD - y + 10}px`);
-        el.style.setProperty("--fb", `${b.bottom + PAD - y - 10}px`);
+        // the frame sits on the element's own box, so it stays still while the pointer moves inside it
+        const b = target.getBoundingClientRect(), fr = f.current!;
+        fr.style.transform = `translate3d(${b.left - PAD}px, ${b.top - PAD}px, 0)`;
+        fr.style.width = `${b.width + PAD * 2}px`;
+        fr.style.height = `${b.height + PAD * 2}px`;
         el.dataset.frame = "";
       } else delete el.dataset.frame;
     };
@@ -48,7 +48,8 @@ export function Crosshair() {
       el.dataset.on = "";
       html.classList.add("hj-crosshair"); // hide the system cursor only once ours is drawn
       const hot = (e.target as Element | null)?.closest?.('a, button, [role="button"], [role="slider"], summary, label, input, select, textarea');
-      target = frameable(e.target as Element | null);
+      const next = frameable(e.target as Element | null);
+      if (next !== target) { target = next; if (!raf) raf = requestAnimationFrame(draw); }
       if (hot && !target) el.dataset.hot = ""; else delete el.dataset.hot;
       if (!raf) raf = requestAnimationFrame(draw);
     };
@@ -83,6 +84,9 @@ export function Crosshair() {
       <div ref={r} className="hj-xhair-r">
         <span className="tl" /><span className="tr" /><span className="bl" /><span className="br" />
         <i />
+      </div>
+      <div ref={f} className="hj-xhair-f">
+        <span className="tl" /><span className="tr" /><span className="bl" /><span className="br" />
       </div>
     </div>
   );
