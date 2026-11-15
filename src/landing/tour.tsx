@@ -355,13 +355,6 @@ export function TourMap({ tour, shipSrc, selected, onSelect }: { tour: Tour; shi
           );
         })}
 
-        {/* ship */}
-        <g style={{ pointerEvents: "none" }}>
-          <circle cx={tail.x} cy={tail.y} r={8} fill={IGNITION} fillOpacity={0.8} filter="url(#hj-tour-engine)" className="hj-engine" />
-          <g className="hj-ship-bob">
-            <image href={shipSrc} width={SHIP} height={SHIP} transform={`translate(${ship.x.toFixed(2)} ${ship.y.toFixed(2)}) rotate(${ship.heading.toFixed(2)}) translate(${-SHIP / 2} ${-SHIP / 2})`} />
-          </g>
-        </g>
       </svg>
 
       {/* labels (HTML, so the brand fonts and opacities match the rest of the page) */}
@@ -385,6 +378,14 @@ export function TourMap({ tour, shipSrc, selected, onSelect }: { tour: Tour; shi
           </div>
         );
       })}
+
+      {/* ship: its own layer above the city labels (still under the hover and country cards) */}
+      <svg aria-hidden viewBox={`0 0 ${MAP_W} ${MAP_H}`} width={MAP_W} height={MAP_H} className="pointer-events-none absolute inset-0">
+        <circle cx={tail.x} cy={tail.y} r={8} fill={IGNITION} fillOpacity={0.8} filter="url(#hj-tour-engine)" className="hj-engine" />
+        <g className="hj-ship-bob">
+          <image href={shipSrc} width={SHIP} height={SHIP} transform={`translate(${ship.x.toFixed(2)} ${ship.y.toFixed(2)}) rotate(${ship.heading.toFixed(2)}) translate(${-SHIP / 2} ${-SHIP / 2})`} />
+        </g>
+      </svg>
 
       {/* legend */}
       <div aria-hidden className="pointer-events-none absolute left-5 top-[19px] flex items-center gap-[22px] text-[11px] leading-[14px] text-[#f5f3f0]/55">
