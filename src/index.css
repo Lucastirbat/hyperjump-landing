@@ -42,6 +42,11 @@ html.hj-crosshair, html.hj-crosshair * { cursor: none !important; }
 .hj-xhair[data-hot] .bl { translate: -4px 4px; }  .hj-xhair[data-hot] .br { translate: 4px 4px; }
 .hj-xhair[data-down] .tl { translate: 2px 2px; }  .hj-xhair[data-down] .tr { translate: -2px 2px; }
 .hj-xhair[data-down] .bl { translate: 2px -2px; } .hj-xhair[data-down] .br { translate: -2px -2px; }
+/* framing a button or link: each bracket goes to one of its corners (offsets set by crosshair.tsx) */
+.hj-xhair[data-frame] .tl { translate: var(--fl) var(--ft); } .hj-xhair[data-frame] .tr { translate: var(--fr) var(--ft); }
+.hj-xhair[data-frame] .bl { translate: var(--fl) var(--fb); } .hj-xhair[data-frame] .br { translate: var(--fr) var(--fb); }
+.hj-xhair[data-frame][data-down] > .hj-xhair-r > span { scale: 0.92; }
+.hj-xhair-r > span { transition: translate 160ms cubic-bezier(0.2, 0.7, 0.2, 1), scale 120ms ease-out; }
 @media (prefers-reduced-motion: reduce) { .hj-xhair, .hj-xhair-r > span { transition: none; } }
 
 /* Soft swap-in (mobile menu). */

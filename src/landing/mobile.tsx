@@ -4,6 +4,7 @@ import { JumpLink } from "@/components/hyperspace";
 import { EXPONENTIAL_HREF, HERO_SUB, HERO_TITLE, STEPS, TIPS } from "./content";
 import { TimelineStack, TOUR_ANCHOR } from "./timeline";
 import { VestingRuler } from "./vesting";
+import { CountUp } from "./motion";
 import { Arrival } from "./arrival";
 import { Ill } from "./ill";
 import { useJumpers } from "./jumpers";
@@ -411,7 +412,7 @@ function MWhatYouGet() {
       </Panel>
       <Panel>
         {head("capital", "001")}
-        <div className="mt-5 flex items-start justify-between gap-4"><p className={big}>$75K<br />for 5%</p><ArtSquare size={120} name="growth" w={92} h={74} /></div>
+        <div className="mt-5 flex items-start justify-between gap-4"><p className={big}><CountUp prefix="$" to={75} suffix="K" /><br />for <CountUp to={5} suffix="%" /></p><ArtSquare size={120} name="growth" w={92} h={74} /></div>
         <div className="mt-4"><Track label="equity" value="5%" fill={0.05} /><Track label="post-money valuation cap" value="$1.5M" fill={1} /></div>
         <div className="mt-5 h-px" style={{ background: SOFT }} />
         <p className="mt-5 text-[14px] leading-[22px] text-[#1f1f1f]">on a SAFE. standard, founder-friendly, no surprises.</p>
@@ -421,7 +422,7 @@ function MWhatYouGet() {
         {head("pit crew", "002")}
         <div className="mt-5 flex items-start justify-between gap-4">
           <p className={big}>
-            5%<br />
+            <CountUp to={5} suffix="%" /><br />
             <button type="button" aria-expanded={tip} aria-describedby="vested-tip-m" onClick={() => setTip((t) => !t)} onBlur={() => setTip(false)} className="relative text-left">
               vested
               <span aria-hidden className="absolute -bottom-0.5 left-0.5 h-0 w-full border-b-[1.5px] border-dashed border-[#1f1f1f]" />

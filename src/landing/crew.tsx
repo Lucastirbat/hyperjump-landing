@@ -114,7 +114,7 @@ function useNearScreen<T extends Element>() {
   return [ref, state] as const;
 }
 
-export function Pit({ model, tone, photos }: { model: string; tone?: number; photos: Map<string, Mentor> }) {
+export function Pit({ model, tone, photos, hot = null, onHot }: { model: string; tone?: number; photos: Map<string, Mentor>; hot?: string | null; onHot?: (key: string | null) => void }) {
   const field = useField();
   const [box, near] = useNearScreen<HTMLDivElement>();
   const names = useRef<(HTMLSpanElement | null)[]>([]);
@@ -152,14 +152,15 @@ export function Pit({ model, tone, photos }: { model: string; tone?: number; pho
       <svg aria-hidden viewBox={`0 0 ${PIT_W} ${PIT_H}`} width={PIT_W} height={PIT_H} className="pointer-events-none absolute inset-0">
         {STATIONS.map((s, i) => (
           <g key={s.key}>
-            <polyline ref={(el) => { els.current.lines[i] = el; }} points="" fill="none" stroke={DUNE} strokeOpacity={0.35} />
-            <circle ref={(el) => { els.current.rings[i] = el; }} cx={-20} cy={-20} r={6} fill="none" stroke="#9999ff" strokeOpacity={0.7} />
-            <circle ref={(el) => { els.current.dots[i] = el; }} cx={-20} cy={-20} r={2.5} fill={IGNITION} />
+            {/* the hovered station's line lights up and its ring pulses; the others step back */}
+            <polyline ref={(el) => { els.current.lines[i] = el; }} points="" fill="none" style={{ stroke: hot === s.key ? "#9999ff" : DUNE, strokeOpacity: hot === null ? 0.35 : hot === s.key ? 0.95 : 0.1, strokeWidth: hot === s.key ? 1.5 : 1, transition: "stroke 200ms, stroke-opacity 200ms" }} />
+            <circle ref={(el) => { els.current.rings[i] = el; }} cx={-20} cy={-20} r={6} fill="none" stroke="#9999ff" className={hot === s.key ? "hj-ping" : undefined} style={{ strokeOpacity: hot === null ? 0.7 : hot === s.key ? 1 : 0.15, transition: "stroke-opacity 200ms" }} />
+            <circle ref={(el) => { els.current.dots[i] = el; }} cx={-20} cy={-20} r={hot === s.key ? 3.5 : 2.5} fill={IGNITION} style={{ opacity: hot === null || hot === s.key ? 1 : 0.3, transition: "opacity 200ms" }} />
           </g>
         ))}
       </svg>
       {STATIONS.map((s, i) => (
-        <a key={s.key} href={`#crew-${s.key}`} className="group absolute w-[270px]" style={{ left: s.side === "left" ? 32 : 786, top: labelTop(s) }}>
+        <a key={s.key} href={`#crew-${s.key}`} className="group absolute w-[270px] transition-opacity duration-200" style={{ left: s.side === "left" ? 32 : 786, top: labelTop(s), opacity: hot === null || hot === s.key ? 1 : 0.35 }} onPointerEnter={() => onHot?.(s.key)} onPointerLeave={() => onHot?.(null)} onFocus={() => onHot?.(s.key)} onBlur={() => onHot?.(null)}>
           <span ref={(el) => { names.current[i] = el; }} className={cn(display, "inline-block text-[22px] leading-7 tracking-[-0.02em] text-[#f5f3f0] decoration-[#f5f3f0]/40 underline-offset-4 group-hover:underline")}>{s.name}</span>
           <span className="mt-[6px] flex flex-wrap gap-[2px]">
             {s.crew.map((m) => <Photo key={m.name} src={lookup(photos, m.name)?.photoUrl ?? null} name={m.name} className="size-6" size={9} dither={false} />)}

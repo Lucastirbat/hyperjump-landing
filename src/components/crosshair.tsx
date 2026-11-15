@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
  * Crosshair cursor (desktop, mouse only): a hairline on the X and Y axes through the pointer, and a small
  * bracket reticle in place of the system cursor (the same corner brackets as the page's frames).
  * Everything blends with `difference`, so it reads on the dark sections and the light panels alike.
- * Over links and buttons the brackets open up; on press they close in. Touch and pen keep their cursor.
+ * Over a button or link the brackets leave the pointer and frame the element itself (its four corners);
+ * over other controls they just open up. On press they close in. Touch and pen keep their cursor.
  */
 export function Crosshair() {
   const [on] = useState(() => typeof window !== "undefined" && window.matchMedia("(hover: hover) and (pointer: fine)").matches);
@@ -18,11 +19,28 @@ export function Crosshair() {
     if (!on || !el) return;
     const html = document.documentElement;
     let x = 0, y = 0, raf = 0;
+    let target: Element | null = null; // the button or link being framed
+    const PAD = 5, MAX_W = 560, MAX_H = 120; // big tiles and cards keep the plain reticle
+    const frameable = (t: Element | null) => {
+      const el = t?.closest?.('a, button, [role="button"]') ?? null;
+      if (!el) return null;
+      const b = el.getBoundingClientRect();
+      return b.width > 0 && b.width <= MAX_W && b.height <= MAX_H ? el : null;
+    };
     const draw = () => {
       raf = 0;
       h.current!.style.transform = `translate3d(0, ${y}px, 0)`;
       v.current!.style.transform = `translate3d(${x}px, 0, 0)`;
       r.current!.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      if (target) {
+        // corner offsets from the pointer, in the brackets' own frame (each sits 10px from its corner)
+        const b = target.getBoundingClientRect();
+        el.style.setProperty("--fl", `${b.left - PAD - x + 10}px`);
+        el.style.setProperty("--fr", `${b.right + PAD - x - 10}px`);
+        el.style.setProperty("--ft", `${b.top - PAD - y + 10}px`);
+        el.style.setProperty("--fb", `${b.bottom + PAD - y - 10}px`);
+        el.dataset.frame = "";
+      } else delete el.dataset.frame;
     };
     const move = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") { delete el.dataset.on; html.classList.remove("hj-crosshair"); return; }
@@ -30,13 +48,17 @@ export function Crosshair() {
       el.dataset.on = "";
       html.classList.add("hj-crosshair"); // hide the system cursor only once ours is drawn
       const hot = (e.target as Element | null)?.closest?.('a, button, [role="button"], [role="slider"], summary, label, input, select, textarea');
-      if (hot) el.dataset.hot = ""; else delete el.dataset.hot;
+      target = frameable(e.target as Element | null);
+      if (hot && !target) el.dataset.hot = ""; else delete el.dataset.hot;
       if (!raf) raf = requestAnimationFrame(draw);
     };
-    const leave = () => { delete el.dataset.on; };
+    const leave = () => { delete el.dataset.on; target = null; delete el.dataset.frame; };
+    // the page can scroll under a still pointer: keep the frame on its element
+    const scroll = () => { if (target && !raf) raf = requestAnimationFrame(draw); };
     const down = () => { el.dataset.down = ""; };
     const up = () => { delete el.dataset.down; };
     window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("scroll", scroll, { passive: true });
     window.addEventListener("pointerdown", down, { passive: true });
     window.addEventListener("pointerup", up, { passive: true });
     html.addEventListener("pointerleave", leave);
@@ -44,6 +66,7 @@ export function Crosshair() {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", move);
+      window.removeEventListener("scroll", scroll);
       window.removeEventListener("pointerdown", down);
       window.removeEventListener("pointerup", up);
       html.removeEventListener("pointerleave", leave);

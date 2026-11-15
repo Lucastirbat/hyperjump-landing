@@ -20,9 +20,14 @@ export function VestingRuler({ className }: { className?: string }) {
   const [dragging, setDragging] = useState(false);
   const track = useRef<HTMLDivElement>(null);
 
+  const last = useRef(month);
   const fromPointer = (e: PointerEvent) => {
     const r = track.current?.getBoundingClientRect(); if (!r || !r.width) return;
-    setMonth(Math.round(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * MONTHS));
+    const m = Math.round(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * MONTHS);
+    // phones (Android): a tiny tick for each month crossed while dragging
+    if (m !== last.current && e.pointerType === "touch") navigator.vibrate?.(6);
+    last.current = m;
+    setMonth(m);
   };
   const down = (e: PointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;

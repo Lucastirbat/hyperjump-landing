@@ -13,6 +13,7 @@ import { bandHeight, CrewCard, Pit, PIT_H, STATIONS, useCrewPhotos } from "./cre
 import { shipTopFor, StopDetails, StopList, TOUR_WHY, TourMap, useSelectedStop, useTour } from "./tour";
 import { BENTO_H, TimelineBento, TOUR_ANCHOR } from "./timeline";
 import { VestingRuler } from "./vesting";
+import { CountUp } from "./motion";
 import { Arrival } from "./arrival";
 
 /*
@@ -318,12 +319,12 @@ function Ticket({ x, y, to, toLabel, stay, accent }: { x: number; y: number; to:
   const small = "absolute text-[12px] leading-[17px]";
   const big = cn(display, "absolute text-[36px] leading-[44px] tracking-[-0.03em] text-[#1f1f1f]");
   return (
-    <Box x={x} y={y} w={W} h={H}>
-      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="absolute inset-0" aria-hidden>
+    <Box x={x} y={y} w={W} h={H} className="hj-ticket">
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="absolute inset-0 overflow-visible" aria-hidden>
         <path d={`M0 0H${PX - R}A${R} ${R} 0 0 0 ${PX + R} 0H${W}V${H}H${PX + R}A${R} ${R} 0 0 0 ${PX - R} ${H}H0Z`} fill={MIST} />
         <path d={`M${PX} ${R + 6}V${H - R - 6}`} stroke={INK} strokeOpacity={0.35} strokeDasharray="3 4" />
         <path d="M127 61H205" stroke={INK} strokeOpacity={0.5} strokeDasharray="3 4" className="hj-flow" />
-        <g transform="translate(215 61)"><Star r={8} color={accent} className="hj-star" /></g>
+        <g transform="translate(215 61)"><g className="hj-ticket-star"><Star r={8} color={accent} className="hj-star" /></g></g>
       </svg>
       <span className={small} style={{ left: 24, top: 18, color: INK66 }}>from</span>
       <span className={big} style={{ left: 24, top: 38 }}>home</span>
@@ -359,7 +360,7 @@ function WhatYouGet() {
 
       {/* capital */}
       {card(260, C, "capital", "001")}
-      <Box x={296} y={C + 87} w={250} as="p" className={big}>$75K<br />for 5%</Box>
+      <Box x={296} y={C + 87} w={250} as="p" className={big}><CountUp prefix="$" to={75} suffix="K" /><br />for <CountUp to={5} suffix="%" /></Box>
       <ArtSquare x={573} y={C + 87} size={220} name="growth" w={170} h={137} />
       <Track x={296} y={C + 335} w={497} label="equity" value="5%" fill={0.05} />
       <Track x={296} y={C + 383} w={497} label="post-money valuation cap" value="$1.5M" fill={1} />
@@ -370,7 +371,7 @@ function WhatYouGet() {
       {/* pit crew */}
       {card(831, C, "pit crew", "002")}
       <Box x={867} y={C + 87} w={250} as="p" className={big}>
-        5%<br />
+        <CountUp to={5} suffix="%" /><br />
         <span className="group/vest relative inline-block cursor-help outline-none" tabIndex={0} aria-describedby="vested-tip">
           vested
           <span aria-hidden className="absolute -bottom-0.5 left-0.5 h-0 w-full border-b-[1.5px] border-dashed border-[#1f1f1f]" />
@@ -401,17 +402,19 @@ function WhatYouGet() {
 // ── pit crew ────────────────────────────────────────────────────────────────
 function PitCrew({ shipUrl, shipTone }: { shipUrl: string; shipTone?: number }) {
   const photos = useCrewPhotos();
+  // hovering a station (its label in the pit, or its band of cards) lights up its line and ship part
+  const [hot, setHot] = useState<string | null>(null);
   return (
     <Section id="crew" h={CREW_H}>
       <Panel h={CREW_H} />
       <TagStrip x={296} y={36} w={1068} label="pit crew" dark solid />
       <Box x={332} y={136} w={970} as="h2" className={cn(display, "text-[64px] leading-[72px] tracking-[-0.03em] text-[#1f1f1f]")}>Your pit crew, available at all times.</Box>
       <Box x={332} y={220} w={640} as="p" className="text-[20px] leading-6" style={{ color: INK80 }}>founders and operators who work with you, not just advise you.</Box>
-      <Box x={296} y={PIT_Y}><Pit model={shipUrl} tone={shipTone} photos={photos} /></Box>
+      <Box x={296} y={PIT_Y}><Pit model={shipUrl} tone={shipTone} photos={photos} hot={hot} onHot={setHot} /></Box>
       {STATIONS.map((st, i) => {
         const y = BAND_YS[i]!;
         return (
-          <div key={st.key} id={`crew-${st.key}`} className="scroll-mt-[60px]">
+          <div key={st.key} id={`crew-${st.key}`} className="scroll-mt-[60px]" onPointerOver={() => setHot(st.key)} onPointerOut={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setHot(null); }}>
             <Hairline x={296} y={y} w={1068} />
             <Box x={296} y={y + 28} w={210}>
               <h3 className={cn(display, "text-[32px] leading-[38px] tracking-[-0.03em] text-[#1f1f1f]")}>{st.name}</h3>
@@ -571,12 +574,12 @@ export function Footer({ shipUrl, shipTone }: { shipUrl: string; shipTone?: numb
         <div className="absolute inset-0 opacity-25" style={{ backgroundImage: PATTERN.hatch("#1c1c1c") }} />
         <img src="/landing/el/hj-mark.svg" alt="" width={89} height={130} className="absolute left-[42px] top-[158px]" />
       </div>
-      <div className="absolute left-[220px] top-[654px] h-[445px] w-[1180px] overflow-hidden" style={{ background: IGNITION, clipPath: chamferAll(16) }}>
+      <div className="hj-shimmer-host absolute left-[220px] top-[654px] h-[445px] w-[1180px] overflow-hidden" style={{ background: IGNITION, clipPath: chamferAll(16) }}>
         <Arrival model={shipUrl} tone={shipTone} x={1000} y={128} size={200} from={1150} trail={690} />
         <p className={cn(display, "absolute left-[74px] top-[259px] text-[28px] leading-[35px] tracking-[-0.03em] text-[#f5f3f0]")}>your chance to build at the frontier.</p>
         <img src="/landing/el/wordmark.svg" alt="" width={1057} height={104} className="absolute left-[76px] top-[305px]" />
         {/* purple halftone over the lower half of the wordmark */}
-        <img src="/landing/el/wordmark-halftone.png" alt="" width={1140} height={306} className="absolute left-10 top-[139px]" />
+        <img src="/landing/el/wordmark-halftone.png" alt="" width={1140} height={306} className="hj-shimmer absolute left-10 top-[139px]" />
       </div>
 
       {/* bottom bar */}

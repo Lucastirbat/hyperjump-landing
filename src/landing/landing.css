@@ -106,3 +106,32 @@
   .hj-arrival .hj-streak, .hj-arrival .hj-flash { display: none; }
   .hj-arrival .hj-arrive, .hj-arrival .hj-trail, .hj-arrival .hj-arrival-bob { animation: none !important; }
 }
+
+/* San Francisco tile: the Golden Gate draws itself in, left to right (motion.tsx GoldenGate). */
+.hj-gg svg { display: block; width: 100%; height: auto; }
+.hj-gg line, .hj-gg path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.hj-gg circle { opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; transform: scale(0.3); }
+.hj-gg.is-on line, .hj-gg.is-on path { animation: hj-gg-draw 1000ms cubic-bezier(0.3, 0.1, 0.2, 1) var(--d, 0ms) forwards; }
+.hj-gg.is-on circle { animation: hj-gg-dot 600ms cubic-bezier(0.2, 0.8, 0.2, 1.3) 1700ms forwards; }
+@keyframes hj-gg-draw { to { stroke-dashoffset: 0; } }
+@keyframes hj-gg-dot { to { opacity: 1; transform: none; } }
+
+/* Boarding passes (what you get): on hover the pass lifts a touch and the route runs faster. */
+.hj-ticket { transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+.hj-ticket:hover { transform: translateY(-3px) rotate(-0.5deg); }
+.hj-ticket:hover .hj-flow { animation-duration: 0.5s; }
+.hj-ticket .hj-ticket-star { transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+.hj-ticket:hover .hj-ticket-star { transform: translateX(7px); }
+
+/* Footer wordmark: a soft band of light passes over the halftone dots while the band is hovered. */
+.hj-shimmer { -webkit-mask-image: linear-gradient(100deg, #000 38%, rgba(0, 0, 0, 0.35) 50%, #000 62%); mask-image: linear-gradient(100deg, #000 38%, rgba(0, 0, 0, 0.35) 50%, #000 62%); -webkit-mask-size: 300% 100%; mask-size: 300% 100%; -webkit-mask-position: 100% 0; mask-position: 100% 0; }
+.hj-shimmer-host:hover .hj-shimmer { animation: hj-shimmer 2.8s ease-in-out infinite; }
+@keyframes hj-shimmer { from { -webkit-mask-position: 100% 0; mask-position: 100% 0; } to { -webkit-mask-position: 0% 0; mask-position: 0% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hj-gg line, .hj-gg path { stroke-dasharray: none; stroke-dashoffset: 0; animation: none !important; }
+  .hj-gg circle { opacity: 1; transform: none; animation: none !important; }
+  .hj-ticket, .hj-ticket .hj-ticket-star { transition: none; }
+  .hj-ticket:hover { transform: none; }
+  .hj-shimmer-host:hover .hj-shimmer { animation: none; }
+}

@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "rea
 import { cn } from "@/lib/utils";
 import { JumpLink } from "@/components/hyperspace";
 import { chamferAll, display, DUNE, IGNITION, INK, MIST, ORBITRON } from "./parts";
+import { GoldenGate } from "./motion";
 
 /*
  * Timeline, from Figma "Section / timeline": a bento of six tiles. A rail with the five steps, then one
@@ -239,7 +240,7 @@ function SanFrancisco({ compact }: { compact?: boolean }) {
       </div>
       <div className="flex-1" />
       {/* golden gate, the headlands and the city: a line drawing, purple dot on the pyramid */}
-      <img src="/landing/el/golden-gate.svg" alt="" width={1084} height={130} className={cn("block max-w-none", compact && "w-full h-auto")} />
+      <GoldenGate className={compact ? "w-full" : "w-[1084px]"} />
     </>
   );
 }
