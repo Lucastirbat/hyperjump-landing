@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type AnchorHTMLAttributes, type MouseEvent, type ReactNode, type RefObject } from "react";
 import { APP_URL, SIGN_IN_URL } from "@/lib/config";
+import posthog from "@/lib/posthog";
 
 /*
  * First-person hyperspace jump from the landing page into the platform's sign-in page.
@@ -52,7 +53,9 @@ export function JumpLink({ to, onClick, ...rest }: Omit<AnchorHTMLAttributes<HTM
   const url = platformUrl(to);
   const handle = (e: MouseEvent<HTMLAnchorElement>) => {
     onClick?.(e);
-    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (e.defaultPrevented || e.button !== 0) return;
+    if (to === "/sign-in") posthog.capture("application_cta_clicked");
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     jump(url);
   };

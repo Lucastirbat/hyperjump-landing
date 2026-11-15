@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type RefObject } from "react";
+import posthog from "@/lib/posthog";
 import { cn } from "@/lib/utils";
 import { chamfer, chamferAll, display, DUNE, IGNITION, INK, MIST, ORBITRON } from "./parts";
 import { COUNTRIES, GRATICULE, GRATICULE_LABELS, PROJ } from "./tour-geo";
@@ -266,18 +267,24 @@ export function TourMap({ tour, shipSrc, selected, onSelect }: { tour: Tour; shi
     flyTo(ship, pts[selected]!);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fly only when the selection changes
   }, [selected]);
+  const selectStop = (index: number, source: "map_country" | "map_stop") => {
+    const stop = tour.stops[index]!;
+    posthog.capture("tour_stop_selected", { city: stop.city, country: stop.country, source });
+    onSelect(index);
+  };
   const pickCountry = (name: string) => {
     const stop = tour.stops.findIndex((s) => geoName(s.country) === name);
+    posthog.capture("tour_country_selected", { country: countryName(name), has_scheduled_stop: stop !== -1 });
     if (stop !== -1) {
       setPicked(null);
-      if (stop === selected) flyTo(ship, pts[stop]!); else onSelect(stop);
+      if (stop === selected) flyTo(ship, pts[stop]!); else selectStop(stop, "map_country");
       return;
     }
     const to = CENTRES[name]!;
     const nearest = pts.reduce((b, p, i) => (Math.hypot(p[0] - to[0], p[1] - to[1]) < Math.hypot(pts[b]![0] - to[0], pts[b]![1] - to[1]) ? i : b), 0);
     setPicked({ country: name, nearest });
     flyTo(ship, to);
-    if (nearest !== selected) { skipFly.current = true; onSelect(nearest); }
+    if (nearest !== selected) { skipFly.current = true; selectStop(nearest, "map_country"); }
   };
   const ahead: [number, number][] = [[route.x, route.y], ...pts.slice(route.seg + 1)];
   const line = (p: [number, number][]) => "M" + p.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join("L");
@@ -403,7 +410,7 @@ export function TourMap({ tour, shipSrc, selected, onSelect }: { tour: Tour; shi
             type="button"
             aria-label={`${s.city}, ${s.country}, ${longDate(s.date)}`}
             aria-pressed={selected === i}
-            onClick={() => onSelect(i)}
+            onClick={() => selectStop(i, "map_stop")}
             onMouseEnter={() => setHover(i)}
             onMouseLeave={() => setHover(null)}
             onFocus={() => setHover(i)}
@@ -508,6 +515,11 @@ export function StopList({ tour, selected, onSelect, rows, className }: { tour: 
     measure();
   }, [selected, capped]);
   const fade = `linear-gradient(to bottom, ${edge.top ? "transparent" : "#000"}, #000 28px, #000 calc(100% - 40px), ${edge.bottom ? "transparent" : "#000"})`;
+  const selectStop = (index: number) => {
+    const stop = tour.stops[index]!;
+    posthog.capture("tour_stop_selected", { city: stop.city, country: stop.country, source: "stop_list" });
+    onSelect(index);
+  };
   return (
     <div className={className}>
       <p className="text-[13px] leading-[21px] text-[#1f1f1f]/66">all {tour.stops.length} stops{capped && <span className="text-[#1f1f1f]/40"> // scroll for more</span>}</p>
@@ -525,7 +537,7 @@ export function StopList({ tour, selected, onSelect, rows, className }: { tour: 
                 <button
                   type="button"
                   aria-pressed={selected === i}
-                  onClick={() => onSelect(i)}
+                  onClick={() => selectStop(i)}
                   className={cn("-mx-2 flex h-[33px] w-[calc(100%+16px)] items-center px-2 text-left text-[13px] leading-[21px] transition-colors hover:bg-[#e0dedb]/60", selected === i && "bg-[#e0dedb] hover:bg-[#e0dedb]", st === "visited" && "opacity-50")}
                 >
                   <span className="w-7 text-[#1f1f1f]/25">{String(i + 1).padStart(2, "0")}</span>

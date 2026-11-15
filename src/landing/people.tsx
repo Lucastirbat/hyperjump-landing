@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { API_URL } from "@/lib/config";
+import { posthogLogger } from "@/lib/posthog";
 import { initials, type PastJumper } from "./jumpers";
 import { display, DUNE, MIST, ORBITRON } from "./parts";
 
@@ -31,7 +32,9 @@ export const CREW_COHORT = "hj02-2027";
 async function fetchMentors(): Promise<Mentor[]> {
   const res = await fetch(`${API_URL}/api/public/mentors?cohort=${encodeURIComponent(CREW_COHORT)}`);
   if (!res.ok) throw new Error(`mentors: ${res.status}`);
-  return res.json();
+  const mentors: Mentor[] = await res.json();
+  posthogLogger.info("public_mentors_loaded", { cohort: CREW_COHORT, mentor_count: mentors.length });
+  return mentors;
 }
 
 export function useMentors() {

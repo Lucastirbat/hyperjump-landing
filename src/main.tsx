@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { HyperspaceProvider } from "@/components/hyperspace";
 import { LandingPage } from "@/landing/landing";
 import { liftPreloader } from "./boot";
+import "./lib/posthog";
 import "./index.css";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { refetchOnWindowFocus: false } } });
